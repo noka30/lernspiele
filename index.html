@@ -1,25 +1,401 @@
+<!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <title>Startseite</title>
-  <link rel="stylesheet" href="style.css">  <!-- relativer Pfad -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f3ff">
+  <meta name="description" content="Willkommen zu den Lernspielen.">
+  <title>Lernspiele</title>
   <style>
-  h1 {
+    :root {
+      color-scheme: light;
+      --ink: #29233d;
+      --muted: #6f6a7e;
+      --purple: #7048d8;
+      --purple-dark: #5431b5;
+      --paper: #ffffff;
+      --line: #e9e4f2;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: #faf9fc;
+      color: var(--ink);
+      font-family: "Segoe UI", Arial, sans-serif;
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .wrap {
+      width: min(1080px, calc(100% - 40px));
+      margin-inline: auto;
+    }
+
+    header {
+      padding: 22px 0;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      color: var(--ink);
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .brand span {
+      color: var(--purple);
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    nav a {
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    nav a:hover,
+    nav a:focus-visible {
+      color: var(--purple-dark);
+    }
+
+    .hero {
+      display: grid;
+      min-height: 460px;
+      grid-template-columns: 1.2fr 0.8fr;
+      align-items: center;
+      gap: 48px;
+      padding-block: 52px 72px;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--purple);
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 620px;
+      margin-bottom: 18px;
+      font-size: clamp(2.7rem, 7vw, 5rem);
+      letter-spacing: -0.06em;
+      line-height: 1.04;
+    }
+
+    h1 span {
+      color: var(--purple);
+    }
+
+    .intro {
+      max-width: 510px;
+      margin-bottom: 28px;
+      color: var(--muted);
+      font-size: 1.12rem;
+    }
+
+    .button {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      padding: 0 22px;
+      border-radius: 999px;
+      background: var(--purple);
+      color: #fff;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 160ms ease, transform 160ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      background: var(--purple-dark);
+    }
+
+    .welcome-art {
+      display: grid;
+      width: min(100%, 340px);
+      aspect-ratio: 1;
+      place-items: center;
+      justify-self: center;
+      border: 1px solid #eee8ff;
+      border-radius: 38% 62% 56% 44% / 45% 43% 57% 55%;
+      background:
+        radial-gradient(circle at 68% 28%, #ffe795 0 8%, transparent 8.5%),
+        radial-gradient(circle at 28% 72%, #ffb8d2 0 10%, transparent 10.5%),
+        linear-gradient(145deg, #eee8ff, #d9eaff);
+      box-shadow: 0 24px 70px #44306b1c;
+      font-size: clamp(5rem, 14vw, 8rem);
+      transform: rotate(-5deg);
+    }
+
+    .welcome-art span {
+      transform: rotate(5deg);
+    }
+
+    section {
+      padding-block: 64px;
+    }
+
+    .section-heading {
+      max-width: 560px;
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      margin-bottom: 8px;
+      font-size: clamp(1.9rem, 4vw, 2.6rem);
+      letter-spacing: -0.04em;
+      line-height: 1.15;
+    }
+
+    .section-heading p,
+    .about-card p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .about-card {
+      padding: clamp(24px, 5vw, 42px);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--paper);
+      box-shadow: 0 12px 40px #29233d08;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      min-height: 205px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--paper);
+      box-shadow: 0 12px 40px #29233d08;
+    }
+
+    .card-icon {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 18px;
+      place-items: center;
+      border-radius: 15px;
+      background: #f0ebff;
+      font-size: 1.5rem;
+    }
+
+    .card:nth-child(2) .card-icon {
+      background: #fff2d6;
+    }
+
+    .card:nth-child(3) .card-icon {
+      background: #e2f6ec;
+    }
+
+    .card h3 {
+      margin-bottom: 6px;
+      font-size: 1.15rem;
+    }
+
+    .card p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .contact {
+      padding-top: 24px;
+      padding-bottom: 76px;
+    }
+
+    .contact-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: clamp(26px, 5vw, 44px);
+      border-radius: 24px;
+      background: #29233d;
+      color: #fff;
+    }
+
+    .contact-box h2 {
+      margin-bottom: 8px;
+    }
+
+    .contact-box p {
+      margin-bottom: 0;
+      color: #d2cddd;
+    }
+
+    .contact-box .button {
+      flex: 0 0 auto;
+      background: #fff;
+      color: var(--purple-dark);
+    }
+
+    .contact-box .button:hover {
+      background: #f0ebff;
+    }
+
+    footer {
+      padding: 22px 0;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.9rem;
       text-align: center;
-      color: rgb(255, 255, 255);
-      background: rgb(0, 0, 0);
-      padding: 1rem 2rem;
-      border-radius: 12px;
-      line-height: 1.5;
-      word-wrap: break-word;
-    }</style>
+    }
+
+    @media (max-width: 720px) {
+      .hero {
+        min-height: auto;
+        grid-template-columns: 1fr;
+        gap: 34px;
+        padding-top: 38px;
+      }
+
+      .welcome-art {
+        width: min(70vw, 280px);
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        min-height: auto;
+      }
+
+      .contact-box {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 460px) {
+      .wrap {
+        width: min(100% - 28px, 1080px);
+      }
+
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      nav {
+        gap: 16px;
+      }
+
+      section {
+        padding-block: 48px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
 </head>
 <body>
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="#start">Lernspiele</a>
+      <nav aria-label="Hauptnavigation">
+        <a href="about.html">Flappy Bird</a>
+  
+      </nav>
+    </div>
+  </header>
 
-<nav>
-  <a href="about.html">lol</a>
-</nav>
+  <main>
+    <section class="wrap hero" id="start" aria-labelledby="welcome-title">
+      <div>
+        <p class="eyebrow">Schön, dass du da bist</p>
+        <h1 id="welcome-title">Willkommen auf <span>Unserer Seite!</span></h1>
+        <a class="button" href="https://www.youtube.com/watch?v=Aq5WXmQQooo" target="_blank" rel="noopener noreferrer">Zum beliebtesten Spiel <span aria-hidden="true">&nbsp;↗</span></a>
+      </div>
+      <div class="welcome-art" aria-hidden="true"><span>🚀</span></div>
+    </section>
 
+    <section class="wrap" id="ueber-mich" aria-labelledby="about-title">
+      <div class="section-heading">
+        <p class="eyebrow"></p>
+        <h2 id="about-title">Hallo,wir sind da!</h2>
+      </div>
+      <div class="about-card">
+        <p>Willkommen auf unserer Website. Hier haben wir ein Paar lernspiele eingebaut!</p>
+      </div>
+    </section>
 
+  
+        </article>
+      </div>
+    </section>
+
+    <section class="wrap contact" id="kontakt" aria-labelledby="contact-title">
+      <div class="contact-box">
+        <div>
+          <p class="eyebrow">Bis bald!</p>
+          <h2 id="contact-title">Danke fürs Vorbeischauen.</h2>
+          <p>Schau gerne wieder vorbei – hier gibt es immer Neues zu entdecken.</p>
+        </div>
+        <a class="button" href="#start">Nach oben ↑</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">© <span id="year">2026</span> Noahs kleine Website</div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
