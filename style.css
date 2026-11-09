@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=windows-1252">
+    <link rel="alternate stylesheet" type="text/css" href="resource://gre-resources/plaintext.css"
+
+      title="Lange Zeilen umbrechen">
+  </head>
+  <body>
+    <pre>body {
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
+  line-height: 1.6;
+  background: #f7f7f7;
+}
+
+nav {
+  margin-bottom: 20px;
+  background: #333;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  margin-right: 15px;
+  font-weight: bold;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+h1 {
+  color: #f7f7f7;
+}
+
+/* Allgemeine Formatierung des Links */
+a.stilvoller-link {
+    background-color: black; /* Hintergrundfarbe Schwarz */
+    color: white;             /* Textfarbe Weiß */
+    padding: 10px 15px;       /* Innenabstand für bessere Lesbarkeit */
+    text-decoration: none;    /* Standard-Unterstreichung entfernen */
+    display: inline-block;    /* Ermöglicht die Anwendung von Padding/Margin */
+    border-radius: 5px;       /* Optionale abgerundete Ecken */
+}
+
+/* Formatierung beim Hover (wenn die Maus darüberfährt) */
+a.stilvoller-link:hover {
+    text-decoration: underline; /* Text beim Hover unterstreichen */
+    /* Sie können hier weitere Hover-Effekte hinzufügen, z.B. */
+    /* background-color: #333; */ /* Ein etwas helleres Schwarz */
+}
+  </pre>
+  </body>
+</html>
