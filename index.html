@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lernspiele für die Klasse</title>
+  <style>
+    /* Grundlegendes Styling */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f4f7f6;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Obere Navigationsleiste */
+    header {
+      background-color: #4A90E2;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.2s;
+    }
+
+    nav a:hover {
+      color: #D0E1F9;
+    }
+
+    /* Hauptbereich */
+    main {
+      flex: 1;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      width: 100%;
+    }
+
+    .welcome-section {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .welcome-section h2 {
+      margin-bottom: 0.5rem;
+      color: #2C3E50;
+    }
+
+    /* Kacheln für Spiele */
+    .games-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .game-card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-left: 5px solid #4A90E2;
+    }
+
+    .game-info h3 {
+      margin-bottom: 0.5rem;
+      color: #2C3E50;
+    }
+
+    .game-info p {
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    .play-button {
+      display: inline-block;
+      background-color: #2ECC71;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.2s;
+    }
+
+    .play-button:hover {
+      background-color: #27AE60;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #e9ecef;
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigationsleiste oben -->
+  <header>
+    <h1>Klassen-Lernspiele</h1>
+    <nav>
+      <ul>
+        <li><a href="index.html">Startseite</a></li>
+        <li><a href="satzgliederspiele.html">Satzglieder</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hauptinhalt -->
+  <main>
+    <section class="welcome-section">
+      <h2>Willkommen zu unseren Lernspielen!</h2>
+      <p>Wähle ein Thema aus, um zu üben und dein Wissen zu testen.</p>
+    </section>
+
+    <!-- Bereich für verfügbare Spiele -->
+    <section class="games-grid">
+      <div class="game-card">
+        <div class="game-info">
+          <h3>Satzglieder-Training</h3>
+          <p>Übe Subjekt, Prädikat, Objekt und Adverbialbestimmungen.</p>
+        </div>
+        <a href="satzgliederspiele.html" class="play-button">Jetzt spielen</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Klassen-Lernplattform</p>
+  </footer>
+
+</body>
+</html>
