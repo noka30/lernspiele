@@ -236,7 +236,6 @@ select {
   </div>
 </main>
 
-<!-- Firebase-Bibliotheken -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -330,12 +329,10 @@ let skinColor = "#ffd447";
 
 $("best").textContent = best;
 
-/* ==========================================
-   FIREBASE – gemeinsame Online-Rangliste
-   ========================================== */
+/* FIREBASE */
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAy5CpQ0Q7V_ZyI4CrEa8h0-nJ_a3VJbBFE",
+  apiKey: "AIzaSyAy5Cp0Q0Q7V_ZyI4CrEa8h0-nJ_a3VJbBFE",
   authDomain: "flappy-satzglieder.firebaseapp.com",
   databaseURL: "https://flappy-satzglieder-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "flappy-satzglieder",
@@ -354,7 +351,6 @@ try {
   auth = firebase.auth();
   database = firebase.database();
 
-  // Jeder Browser erhält eine anonyme Spieler-ID.
   firebaseReady = auth.signInAnonymously()
     .then(() => true)
     .catch(error => {
@@ -410,7 +406,6 @@ function reset() {
 }
 
 function draw() {
-  // Wichtig: Beim Laden gibt es noch keinen Vogel.
   if (!bird) return;
 
   ctx.clearRect(0, 0, W, H);
@@ -734,10 +729,7 @@ function continueGame() {
   requestAnimationFrame(tick);
 }
 
-/* ==========================================
-   FIREBASE-RANGLISTE
-   Ein Eintrag pro anonymem Spieler-Konto
-   ========================================== */
+/* FIREBASE-RANGLISTE */
 
 function renderLeaderboard(entries) {
   const listElement = $("highScoreList");
@@ -811,7 +803,6 @@ async function saveFirebaseScore(newName,newScore) {
     const uid = auth.currentUser.uid;
     const playerRef = database.ref("scores/" + uid);
 
-    // Vorhandenen Eintrag lesen, damit der persönliche Bestwert bleibt.
     const snapshot = await playerRef.once("value");
     const oldEntry = snapshot.val() || {};
     const bestScore = Math.max(Number(oldEntry.score) || 0,numericScore);
@@ -828,10 +819,13 @@ async function saveFirebaseScore(newName,newScore) {
     await loadFirebaseLeaderboard();
 
   } catch (error) {
-    console.error("Online-Speichern fehlgeschlagen:",error);
+    console.error("Firebase-Fehler:", error);
+
     alert(
-      "Online-Speichern war leider nicht möglich.\n\n" +
-      "Bitte prüfe deine Internetverbindung und die Firebase-Regeln."
+      "Firebase-Fehler:\n" +
+      (error.code || "Unbekannter Fehler") +
+      "\n\n" +
+      (error.message || "Keine weitere Beschreibung")
     );
   } finally {
     button.disabled = false;
@@ -898,8 +892,6 @@ document.addEventListener("keydown",e => {
   }
 });
 
-// Beim Laden noch keinen Vogel zeichnen.
-// Der Vogel wird erst in reset() beim Spielstart erstellt.
 updateHud();
 
 })();
