@@ -229,14 +229,14 @@ select {
           <button id="saveScoreBtn" style="padding:10px;margin-top:5px;background:#4cd97b;color:white;width:70%;margin-left:auto;margin-right:auto;border-radius:8px;border:0;cursor:pointer;font-weight:bold;">Online Speichern</button>
         </div>
         <h3 style="font-size:16px;margin:15px 0 5px;">🏆 Online Rangliste – alle Plätze</h3>
-        <ol id="highScoreList" style="text-align:left;padding-left:30px;font-size:14px;max-height:120px;overflow-y:auto;"></ol>
+        <ol id="highScoreList" style="text-align:left;padding-left:30px;font-size:14px;max-height:180px;overflow-y:auto;"></ol>
         <button class="primary" id="againBtn" style="margin-top:15px;">Nochmal versuchen ↻</button>
       </div>
     </section>
   </div>
 </main>
 
-<!-- Firebase -->
+<!-- Firebase-Bibliotheken -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -296,12 +296,8 @@ let W = 0, H = 0;
 function resize() {
   W = canvas.width = canvas.parentElement.clientWidth;
   H = canvas.height = canvas.parentElement.clientHeight;
-  if (bird) {
-    bird.x = W * 0.25;
-    bird.y = Math.min(bird.y, H - 65);
-  }
-  draw();
 }
+
 window.addEventListener("resize", resize);
 resize();
 
@@ -333,6 +329,43 @@ let best = Number(localStorage.getItem("satzgliederFlappyBest") || 0);
 let skinColor = "#ffd447";
 
 $("best").textContent = best;
+
+/* ==========================================
+   FIREBASE – gemeinsame Online-Rangliste
+   ========================================== */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAy5CpQ0Q7V_ZyI4CrEa8h0-nJ_a3VJbBFE",
+  authDomain: "flappy-satzglieder.firebaseapp.com",
+  databaseURL: "https://flappy-satzglieder-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "flappy-satzglieder",
+  storageBucket: "flappy-satzglieder.firebasestorage.app",
+  messagingSenderId: "169698951022",
+  appId: "1:169698951022:web:7f05006e4d276bf8a18b7f",
+  measurementId: "G-Y7G8ZC341W"
+};
+
+let database = null;
+let auth = null;
+let firebaseReady = null;
+
+try {
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  database = firebase.database();
+
+  // Jeder Browser erhält eine anonyme Spieler-ID.
+  firebaseReady = auth.signInAnonymously()
+    .then(() => true)
+    .catch(error => {
+      console.error("Firebase-Anmeldung fehlgeschlagen:", error);
+      return false;
+    });
+
+} catch (error) {
+  console.error("Firebase konnte nicht gestartet werden:", error);
+  firebaseReady = Promise.resolve(false);
+}
 
 function updateHud() {
   $("score").textContent = score;
@@ -377,6 +410,9 @@ function reset() {
 }
 
 function draw() {
+  // Wichtig: Beim Laden gibt es noch keinen Vogel.
+  if (!bird) return;
+
   ctx.clearRect(0, 0, W, H);
 
   ctx.fillStyle = "rgba(255,255,255,0.55)";
@@ -387,8 +423,6 @@ function draw() {
     ctx.arc(x+48,y,22,0,Math.PI*2);
     ctx.fill();
   });
-
-  if (!bird) return;
 
   items.forEach(it => {
     if (!it.collected) {
@@ -700,129 +734,104 @@ function continueGame() {
   requestAnimationFrame(tick);
 }
 
-// ==========================================
-// Firebase Online-Rangliste
-// ==========================================
+/* ==========================================
+   FIREBASE-RANGLISTE
+   Ein Eintrag pro anonymem Spieler-Konto
+   ========================================== */
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAy5CpQ0Q7V_ZyI4CrEa8h0-nJ_a3VJbBFE",
-  authDomain: "flappy-satzglieder.firebaseapp.com",
-  databaseURL: "https://flappy-satzglieder-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "flappy-satzglieder",
-  storageBucket: "flappy-satzglieder.firebasestorage.app",
-  messagingSenderId: "169698951022",
-  appId: "1:169698951022:web:7f05006e4d276bf8a18b7f",
-  measurementId: "G-Y7G8ZC341W"
-};
+function renderLeaderboard(entries) {
+  const listElement = $("highScoreList");
+  listElement.innerHTML = "";
 
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const database = firebase.database();
-
-let playerUid = null;
-
-const authReady = auth.signInAnonymously()
-  .then(userCredential => {
-    playerUid = userCredential.user.uid;
-  })
-  .catch(error => {
-    console.error("Firebase-Anmeldung fehlgeschlagen:", error);
-    throw error;
-  });
-
-async function loadFirebaseLeaderboard() {
-  const list = $("highScoreList");
-
-  try {
-    await authReady;
-    const snapshot = await database.ref("scores").once("value");
-    const data = snapshot.val() || {};
-    renderLeaderboard(Object.values(data));
-  } catch (error) {
-    console.error("Rangliste konnte nicht geladen werden:", error);
-    list.innerHTML =
-      "<li style='list-style:none;color:#777;'>Online-Rangliste momentan nicht erreichbar.</li>";
-  }
-}
-
-function renderLeaderboard(scores) {
-  const list = $("highScoreList");
-  list.innerHTML = "";
-
-  const sorted = [...scores].sort(
-    (a,b) => Number(b.score)-Number(a.score)
-  );
+  const sorted = entries
+    .filter(item => item && typeof item.name === "string")
+    .sort((a,b) => Number(b.score || 0) - Number(a.score || 0));
 
   if (sorted.length === 0) {
-    list.innerHTML =
-      "<li style='list-style:none;text-align:center;color:#777;'>Noch keine Einträge.</li>";
+    listElement.innerHTML =
+      "<li style='list-style:none;text-align:center;color:#777;'>Noch keine Einträge</li>";
     return;
   }
 
   sorted.forEach((item,index) => {
     const li = document.createElement("li");
     const name = document.createElement("b");
-
-    name.textContent = (index+1) + ". " + String(item.name || "Unbekannt");
+    name.textContent = (index+1) + ". " + item.name;
     li.appendChild(name);
     li.appendChild(
       document.createTextNode(": " + Number(item.score || 0) + " Pkt.")
     );
-    list.appendChild(li);
+    listElement.appendChild(li);
   });
 }
 
-async function saveFirebaseScore(newName,newScore) {
-  const name = String(newName || "").trim().slice(0,15);
-  const value = Number(newScore);
+async function loadFirebaseLeaderboard() {
+  try {
+    const signedIn = await firebaseReady;
+    if (!signedIn) {
+      throw new Error("Firebase-Anmeldung nicht möglich.");
+    }
 
-  if (!name) {
+    const snapshot = await database.ref("scores").once("value");
+    const data = snapshot.val() || {};
+    const entries = Object.values(data);
+
+    renderLeaderboard(entries);
+  } catch (error) {
+    console.error("Rangliste konnte nicht geladen werden:",error);
+    $("highScoreList").innerHTML =
+      "<li style='list-style:none;text-align:center;color:#777;'>Online-Rangliste momentan nicht erreichbar.</li>";
+  }
+}
+
+async function saveFirebaseScore(newName,newScore) {
+  const trimmedName = String(newName || "").trim().slice(0,15);
+  const numericScore = Number(newScore);
+
+  if (!trimmedName) {
     alert("Bitte gib einen Namen ein!");
     return;
   }
 
-  if (!Number.isSafeInteger(value) || value < 0) {
-    alert("Ungültiger Punktestand.");
+  if (!Number.isFinite(numericScore) || numericScore < 0) {
+    alert("Der Punktestand ist ungültig.");
     return;
   }
 
   const button = $("saveScoreBtn");
   button.disabled = true;
-  button.textContent = "Wird gespeichert ...";
+  button.textContent = "Wird gespeichert …";
 
   try {
-    await authReady;
-
-    if (!playerUid) {
-      throw new Error("Anmeldung nicht möglich.");
+    const signedIn = await firebaseReady;
+    if (!signedIn || !auth.currentUser) {
+      throw new Error("Anmeldung bei Firebase fehlgeschlagen.");
     }
 
-    const playerRef = database.ref("scores/" + playerUid);
-    const snapshot = await playerRef.once("value");
-    const previous = snapshot.val();
+    const uid = auth.currentUser.uid;
+    const playerRef = database.ref("scores/" + uid);
 
-    const bestScore = Math.max(
-      value,
-      Number(previous && previous.score) || 0
-    );
+    // Vorhandenen Eintrag lesen, damit der persönliche Bestwert bleibt.
+    const snapshot = await playerRef.once("value");
+    const oldEntry = snapshot.val() || {};
+    const bestScore = Math.max(Number(oldEntry.score) || 0,numericScore);
 
     await playerRef.set({
-      name: name,
+      name: trimmedName,
       score: bestScore
     });
 
-    localStorage.setItem("flappyPlayerName",name);
+    localStorage.setItem("flappyPlayerName",trimmedName);
 
-    alert("Dein Punktestand wurde online gespeichert! 🎉");
+    alert("Dein Score wurde online gespeichert! 🎉");
     $("scoreInputArea").style.display = "none";
-
     await loadFirebaseLeaderboard();
 
   } catch (error) {
     console.error("Online-Speichern fehlgeschlagen:",error);
     alert(
-      "Online-Speichern fehlgeschlagen. Bitte prüfe deine Internetverbindung und Firebase-Einstellungen. Dein lokaler Rekord bleibt erhalten."
+      "Online-Speichern war leider nicht möglich.\n\n" +
+      "Bitte prüfe deine Internetverbindung und die Firebase-Regeln."
     );
   } finally {
     button.disabled = false;
@@ -834,15 +843,16 @@ $("saveScoreBtn").onclick = () => {
   const savedName = localStorage.getItem("flappyPlayerName");
   const typedName = $("playerName").value.trim();
   const nameToUse = typedName || savedName || "";
+
   saveFirebaseScore(nameToUse,score);
 };
 
 function gameOver() {
-  clearInterval(timerInterval);
   active = false;
+  clearInterval(timerInterval);
   $("quizPanel").style.display = "none";
   $("endPanel").style.display = "flex";
-  $("endText").textContent = `Du hast ${score} Punkte erzielt!`;
+  $("endText").innerHTML = `Du hast <b>${score} Punkte</b> erzielt!`;
 
   const savedName = localStorage.getItem("flappyPlayerName");
 
@@ -856,9 +866,6 @@ function gameOver() {
   }
 
   $("scoreInputArea").style.display = "block";
-  $("highScoreList").innerHTML =
-    "<li style='list-style:none;color:#777;'>Rangliste wird geladen ...</li>";
-
   loadFirebaseLeaderboard();
 }
 
@@ -891,7 +898,8 @@ document.addEventListener("keydown",e => {
   }
 });
 
-draw();
+// Beim Laden noch keinen Vogel zeichnen.
+// Der Vogel wird erst in reset() beim Spielstart erstellt.
 updateHud();
 
 })();
