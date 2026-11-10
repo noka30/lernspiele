@@ -228,13 +228,18 @@ select {
           <input type="text" id="playerName" placeholder="Dein Name" maxlength="15" style="padding:10px;border-radius:8px;border:1px solid #ccc;width:70%;font-size:14px;">
           <button id="saveScoreBtn" style="padding:10px;margin-top:5px;background:#4cd97b;color:white;width:70%;margin-left:auto;margin-right:auto;border-radius:8px;border:0;cursor:pointer;font-weight:bold;">Online Speichern</button>
         </div>
-        <h3 style="font-size:16px;margin:15px 0 5px;">🏆 Online Top 5 Rangliste</h3>
+        <h3 style="font-size:16px;margin:15px 0 5px;">🏆 Online Rangliste – alle Plätze</h3>
         <ol id="highScoreList" style="text-align:left;padding-left:30px;font-size:14px;max-height:120px;overflow-y:auto;"></ol>
         <button class="primary" id="againBtn" style="margin-top:15px;">Nochmal versuchen ↻</button>
       </div>
     </section>
   </div>
 </main>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script>
 (() => {
@@ -291,6 +296,11 @@ let W = 0, H = 0;
 function resize() {
   W = canvas.width = canvas.parentElement.clientWidth;
   H = canvas.height = canvas.parentElement.clientHeight;
+  if (bird) {
+    bird.x = W * 0.25;
+    bird.y = Math.min(bird.y, H - 65);
+  }
+  draw();
 }
 window.addEventListener("resize", resize);
 resize();
@@ -377,6 +387,8 @@ function draw() {
     ctx.arc(x+48,y,22,0,Math.PI*2);
     ctx.fill();
   });
+
+  if (!bird) return;
 
   items.forEach(it => {
     if (!it.collected) {
@@ -689,81 +701,66 @@ function continueGame() {
 }
 
 // ==========================================
-// npoint.io Online-Rangliste
-// Sicheres Laden/Speichern mit lokaler Warteschlange
+// Firebase Online-Rangliste
 // ==========================================
 
-const npointUrl = "https://api.npoint.io/c3a2fbf32a028bb057a1";
-const pendingScoresKey = "flappyPendingOnlineScores";
-let leaderboardBusy = false;
+const firebaseConfig = {
+  apiKey: "AIzaSyAy5CpQ0Q7V_ZyI4CrEa8h0-nJ_a3VJbBFE",
+  authDomain: "flappy-satzglieder.firebaseapp.com",
+  databaseURL: "https://flappy-satzglieder-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "flappy-satzglieder",
+  storageBucket: "flappy-satzglieder.firebasestorage.app",
+  messagingSenderId: "169698951022",
+  appId: "1:169698951022:web:7f05006e4d276bf8a18b7f",
+  measurementId: "G-Y7G8ZC341W"
+};
 
-function readPendingScores() {
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const database = firebase.database();
+
+let playerUid = null;
+
+const authReady = auth.signInAnonymously()
+  .then(userCredential => {
+    playerUid = userCredential.user.uid;
+  })
+  .catch(error => {
+    console.error("Firebase-Anmeldung fehlgeschlagen:", error);
+    throw error;
+  });
+
+async function loadFirebaseLeaderboard() {
+  const list = $("highScoreList");
+
   try {
-    const value = JSON.parse(localStorage.getItem(pendingScoresKey) || "[]");
-    return Array.isArray(value) ? value : [];
+    await authReady;
+    const snapshot = await database.ref("scores").once("value");
+    const data = snapshot.val() || {};
+    renderLeaderboard(Object.values(data));
   } catch (error) {
-    console.warn("Lokale Warteschlange konnte nicht gelesen werden:",error);
-    return [];
-  }
-}
-
-function queueScore(name,value) {
-  const pending = readPendingScores();
-  const index = pending.findIndex(item =>
-    String(item.name || "").toLowerCase() === name.toLowerCase()
-  );
-
-  if (index >= 0) {
-    pending[index].score = Math.max(Number(pending[index].score)||0,value);
-  } else {
-    pending.push({name,score:value});
-  }
-
-  localStorage.setItem(pendingScoresKey,JSON.stringify(pending));
-}
-
-async function getOnlineScores() {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(),12000);
-
-  try {
-    const response = await fetch(npointUrl,{
-      method:"GET",
-      cache:"no-store",
-      signal:controller.signal
-    });
-
-    if (!response.ok) {
-      throw new Error("Server antwortet mit HTTP " + response.status);
-    }
-
-    const data = await response.json();
-
-    if (!data || !Array.isArray(data.scores)) {
-      throw new Error("Die Antwort der Rangliste hat ein unerwartetes Format.");
-    }
-
-    return data.scores;
-  } finally {
-    clearTimeout(timeout);
+    console.error("Rangliste konnte nicht geladen werden:", error);
+    list.innerHTML =
+      "<li style='list-style:none;color:#777;'>Online-Rangliste momentan nicht erreichbar.</li>";
   }
 }
 
 function renderLeaderboard(scores) {
-  const listElement = $("highScoreList");
-  listElement.innerHTML = "";
+  const list = $("highScoreList");
+  list.innerHTML = "";
 
   const sorted = [...scores].sort(
     (a,b) => Number(b.score)-Number(a.score)
   );
 
   if (sorted.length === 0) {
-    listElement.innerHTML =
-      "<li style='list-style:none;text-align:center;color:#777;'>Noch keine Einträge</li>";
+    list.innerHTML =
+      "<li style='list-style:none;text-align:center;color:#777;'>Noch keine Einträge.</li>";
     return;
   }
 
-  sorted.slice(0,5).forEach((item,index) => {
+  sorted.forEach((item,index) => {
     const li = document.createElement("li");
     const name = document.createElement("b");
 
@@ -772,190 +769,80 @@ function renderLeaderboard(scores) {
     li.appendChild(
       document.createTextNode(": " + Number(item.score || 0) + " Pkt.")
     );
-    listElement.appendChild(li);
+    list.appendChild(li);
   });
 }
 
-async function loadNPointLeaderboard() {
-  try {
-    const scores = await getOnlineScores();
-    renderLeaderboard(scores);
-  } catch (error) {
-    console.warn("Online-Rangliste konnte nicht geladen werden:",error);
-    $("highScoreList").innerHTML =
-      "<li style='list-style:none;text-align:center;color:#777;'>Online-Rangliste momentan nicht erreichbar. Dein lokaler Rekord bleibt erhalten.</li>";
-  }
-}
+async function saveFirebaseScore(newName,newScore) {
+  const name = String(newName || "").trim().slice(0,15);
+  const value = Number(newScore);
 
-function mergeScore(scores,newEntry) {
-  const result = [...scores];
-
-  const index = result.findIndex(item =>
-    String(item.name || "").toLowerCase() === newEntry.name.toLowerCase()
-  );
-
-  if (index >= 0) {
-    result[index] = {
-      ...result[index],
-      name:newEntry.name,
-      score:Math.max(
-        Number(result[index].score)||0,
-        Number(newEntry.score)||0
-      )
-    };
-  } else {
-    result.push({
-      name:newEntry.name,
-      score:Number(newEntry.score)||0
-    });
-  }
-
-  return result
-    .filter(item =>
-      item &&
-      typeof item.name === "string" &&
-      Number.isFinite(Number(item.score))
-    )
-    .sort((a,b) => Number(b.score)-Number(a.score))
-    .slice(0,5);
-}
-
-async function putOnlineScores(scores) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(),12000);
-
-  try {
-    const response = await fetch(npointUrl,{
-      method:"PUT",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({scores}),
-      signal:controller.signal
-    });
-
-    if (!response.ok) {
-      throw new Error("Speichern fehlgeschlagen (HTTP " + response.status + ")");
-    }
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
-async function saveNPointScore(newName,newScore) {
-  const trimmedName = String(newName || "").trim().slice(0,15);
-  const numericScore = Number(newScore);
-
-  if (!trimmedName) {
+  if (!name) {
     alert("Bitte gib einen Namen ein!");
     return;
   }
 
-  if (!Number.isFinite(numericScore) || numericScore < 0) {
-    alert("Der Punktestand ist ungültig.");
+  if (!Number.isSafeInteger(value) || value < 0) {
+    alert("Ungültiger Punktestand.");
     return;
   }
 
-  localStorage.setItem("flappyPlayerName",trimmedName);
-
   const button = $("saveScoreBtn");
   button.disabled = true;
-  button.textContent = "Wird gespeichert …";
+  button.textContent = "Wird gespeichert ...";
 
   try {
-    // Erst lesen, dann ändern.
-    // Bei Lesefehler niemals eine leere Liste hochladen.
-    const currentScores = await getOnlineScores();
+    await authReady;
 
-    const updatedScores = mergeScore(
-      currentScores,
-      {name:trimmedName,score:numericScore}
-    );
-
-    await putOnlineScores(updatedScores);
-
-    const pending = readPendingScores().filter(item =>
-      String(item.name || "").toLowerCase() !== trimmedName.toLowerCase()
-    );
-
-    localStorage.setItem(pendingScoresKey,JSON.stringify(pending));
-
-    alert("Score wurde vom Server bestätigt und online gespeichert! 🎉");
-    $("scoreInputArea").style.display = "none";
-    renderLeaderboard(updatedScores);
-
-  } catch (error) {
-    console.warn("Online-Speichern fehlgeschlagen:",error);
-
-    try {
-      queueScore(trimmedName,numericScore);
-
-      alert(
-        "Online-Speichern momentan nicht möglich. " +
-        "Dein Score wurde auf diesem Gerät zwischengespeichert. " +
-        "Bitte später erneut versuchen.\n\n" +
-        "Dein lokaler Rekord bleibt erhalten."
-      );
-
-    } catch (storageError) {
-      alert(
-        "Online-Speichern fehlgeschlagen und die lokale " +
-        "Zwischenspeicherung ist nicht verfügbar. " +
-        "Bitte lösche keine Browserdaten und versuche es später erneut."
-      );
+    if (!playerUid) {
+      throw new Error("Anmeldung nicht möglich.");
     }
 
+    const playerRef = database.ref("scores/" + playerUid);
+    const snapshot = await playerRef.once("value");
+    const previous = snapshot.val();
+
+    const bestScore = Math.max(
+      value,
+      Number(previous && previous.score) || 0
+    );
+
+    await playerRef.set({
+      name: name,
+      score: bestScore
+    });
+
+    localStorage.setItem("flappyPlayerName",name);
+
+    alert("Dein Punktestand wurde online gespeichert! 🎉");
+    $("scoreInputArea").style.display = "none";
+
+    await loadFirebaseLeaderboard();
+
+  } catch (error) {
+    console.error("Online-Speichern fehlgeschlagen:",error);
+    alert(
+      "Online-Speichern fehlgeschlagen. Bitte prüfe deine Internetverbindung und Firebase-Einstellungen. Dein lokaler Rekord bleibt erhalten."
+    );
   } finally {
     button.disabled = false;
     button.textContent = "Online Speichern";
   }
 }
 
-async function retryPendingScores() {
-  if (leaderboardBusy || !navigator.onLine) return;
-
-  const pending = readPendingScores();
-  if (pending.length === 0) return;
-
-  leaderboardBusy = true;
-
-  try {
-    // Bestehende Rangliste zuerst lesen.
-    let scores = await getOnlineScores();
-
-    for (const entry of pending) {
-      scores = mergeScore(scores,entry);
-    }
-
-    await putOnlineScores(scores);
-    localStorage.removeItem(pendingScoresKey);
-    renderLeaderboard(scores);
-
-    console.info("Zwischengespeicherte Scores wurden online übertragen.");
-
-  } catch (error) {
-    console.warn(
-      "Erneuter Upload der zwischengespeicherten Scores fehlgeschlagen:",
-      error
-    );
-  } finally {
-    leaderboardBusy = false;
-  }
-}
-
-window.addEventListener("online",retryPendingScores);
-
 $("saveScoreBtn").onclick = () => {
   const savedName = localStorage.getItem("flappyPlayerName");
   const typedName = $("playerName").value.trim();
   const nameToUse = typedName || savedName || "";
-
-  saveNPointScore(nameToUse,score);
+  saveFirebaseScore(nameToUse,score);
 };
 
 function gameOver() {
+  clearInterval(timerInterval);
   active = false;
   $("quizPanel").style.display = "none";
   $("endPanel").style.display = "flex";
-  $("endText").innerHTML = `Du hast <b>${score} Punkte</b> erzielt!`;
+  $("endText").textContent = `Du hast ${score} Punkte erzielt!`;
 
   const savedName = localStorage.getItem("flappyPlayerName");
 
@@ -969,8 +856,10 @@ function gameOver() {
   }
 
   $("scoreInputArea").style.display = "block";
-  loadNPointLeaderboard();
-  retryPendingScores();
+  $("highScoreList").innerHTML =
+    "<li style='list-style:none;color:#777;'>Rangliste wird geladen ...</li>";
+
+  loadFirebaseLeaderboard();
 }
 
 function start() {
