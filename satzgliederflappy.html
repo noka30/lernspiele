@@ -352,15 +352,28 @@ try {
   database = firebase.database();
 
   firebaseReady = auth.signInAnonymously()
-    .then(() => true)
+    .then(credential => {
+      console.log("Firebase-Anmeldung erfolgreich!");
+      return {
+        ok: true,
+        user: credential.user
+      };
+    })
     .catch(error => {
       console.error("Firebase-Anmeldung fehlgeschlagen:", error);
-      return false;
+      return {
+        ok: false,
+        error: error
+      };
     });
 
 } catch (error) {
   console.error("Firebase konnte nicht gestartet werden:", error);
-  firebaseReady = Promise.resolve(false);
+
+  firebaseReady = Promise.resolve({
+    ok: false,
+    error: error
+  });
 }
 
 function updateHud() {
@@ -759,9 +772,10 @@ function renderLeaderboard(entries) {
 
 async function loadFirebaseLeaderboard() {
   try {
-    const signedIn = await firebaseReady;
-    if (!signedIn) {
-      throw new Error("Firebase-Anmeldung nicht möglich.");
+    const result = await firebaseReady;
+
+    if (!result.ok) {
+      throw result.error;
     }
 
     const snapshot = await database.ref("scores").once("value");
@@ -769,15 +783,17 @@ async function loadFirebaseLeaderboard() {
     const entries = Object.values(data);
 
     renderLeaderboard(entries);
+
   } catch (error) {
-    console.error("Rangliste konnte nicht geladen werden:",error);
+    console.error("Rangliste konnte nicht geladen werden:", error);
+
     $("highScoreList").innerHTML =
       "<li style='list-style:none;text-align:center;color:#777;'>Online-Rangliste momentan nicht erreichbar.</li>";
   }
 }
 
-async function saveFirebaseScore(newName,newScore) {
-  const trimmedName = String(newName || "").trim().slice(0,15);
+async function saveFirebaseScore(newName, newScore) {
+  const trimmedName = String(newName || "").trim().slice(0, 15);
   const numericScore = Number(newScore);
 
   if (!trimmedName) {
@@ -795,38 +811,46 @@ async function saveFirebaseScore(newName,newScore) {
   button.textContent = "Wird gespeichert …";
 
   try {
-    const signedIn = await firebaseReady;
-    if (!signedIn || !auth.currentUser) {
-      throw new Error("Anmeldung bei Firebase fehlgeschlagen.");
+    const result = await firebaseReady;
+
+    if (!result.ok) {
+      throw result.error;
     }
 
-    const uid = auth.currentUser.uid;
+    const uid = result.user.uid;
     const playerRef = database.ref("scores/" + uid);
 
     const snapshot = await playerRef.once("value");
     const oldEntry = snapshot.val() || {};
-    const bestScore = Math.max(Number(oldEntry.score) || 0,numericScore);
+
+    const bestScore = Math.max(
+      Number(oldEntry.score) || 0,
+      numericScore
+    );
 
     await playerRef.set({
       name: trimmedName,
       score: bestScore
     });
 
-    localStorage.setItem("flappyPlayerName",trimmedName);
+    localStorage.setItem("flappyPlayerName", trimmedName);
 
     alert("Dein Score wurde online gespeichert! 🎉");
+
     $("scoreInputArea").style.display = "none";
+
     await loadFirebaseLeaderboard();
 
   } catch (error) {
     console.error("Firebase-Fehler:", error);
 
     alert(
-      "Firebase-Fehler:\n" +
-      (error.code || "Unbekannter Fehler") +
-      "\n\n" +
+      "Firebase-Fehler:\n\n" +
+      "Fehlercode: " + (error.code || error.name || "Unbekannt") +
+      "\n\nBeschreibung: " +
       (error.message || "Keine weitere Beschreibung")
     );
+
   } finally {
     button.disabled = false;
     button.textContent = "Online Speichern";
