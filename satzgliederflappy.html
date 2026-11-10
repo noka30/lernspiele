@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -36,7 +37,7 @@ html, body {
   grid-template-columns: repeat(5, 1fr);
   gap: 8px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255,255,255,0.55);
   backdrop-filter: blur(8px);
   z-index: 10;
 }
@@ -74,7 +75,7 @@ canvas {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: rgba(10, 30, 48, 0.7);
+  background: rgba(10,30,48,0.7);
   backdrop-filter: blur(6px);
   z-index: 20;
 }
@@ -94,9 +95,16 @@ canvas {
   from { transform: scale(0.9); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
-h2 { margin: 0 0 10px 0; font-size: 24px; color: #102c43; }
-p { font-size: 15px; line-height: 1.5; margin: 10px 0; }
-
+h2 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  color: #102c43;
+}
+p {
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 10px 0;
+}
 button {
   font: inherit;
   font-weight: bold;
@@ -114,6 +122,10 @@ button {
   justify-content: center;
 }
 button:active { transform: scale(0.97); }
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
 .primary {
   background: #ffd45e;
   color: #4a3200;
@@ -121,16 +133,49 @@ button:active { transform: scale(0.97); }
   margin-top: 14px;
   box-shadow: 0 5px 0 #d9a420;
 }
-.primary:active { transform: translateY(2px); box-shadow: 0 2px 0 #d9a420; }
-
-.answers { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
-.answers button { text-align: left; justify-content: flex-start; font-weight: normal; background: #f0f7fc; border: 2px solid #d0e4f2; }
-.answers button.correct { background: #c9f4d8; border-color: #4cd97b; color: #0d5926; font-weight: bold; }
-.answers button.wrong { background: #ffe0d9; border-color: #ff6b4a; color: #7a1c08; }
-
-.feedback { min-height: 45px; font-size: 14px; font-weight: bold; margin: 12px 0; padding: 12px; border-radius: 10px; }
-select { padding: 10px; border-radius: 10px; border: 1px solid #ccc; font-size: 15px; margin-left: 8px; }
-
+.primary:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #d9a420;
+}
+.answers {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+.answers button {
+  text-align: left;
+  justify-content: flex-start;
+  font-weight: normal;
+  background: #f0f7fc;
+  border: 2px solid #d0e4f2;
+}
+.answers button.correct {
+  background: #c9f4d8;
+  border-color: #4cd97b;
+  color: #0d5926;
+  font-weight: bold;
+}
+.answers button.wrong {
+  background: #ffe0d9;
+  border-color: #ff6b4a;
+  color: #7a1c08;
+}
+.feedback {
+  min-height: 45px;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 10px;
+}
+select {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  margin-left: 8px;
+}
 #quizPanel, #endPanel { display: none; }
 </style>
 </head>
@@ -148,13 +193,12 @@ select { padding: 10px; border-radius: 10px; border: 1px solid #ccc; font-size: 
   <div class="stage">
     <canvas id="game"></canvas>
 
-    <!-- Start Panel -->
     <section class="panel" id="startPanel">
       <div class="card">
         <h2>🐤 Flappy Satzglieder</h2>
         <p>Inklusive Subjekt, Prädikat, Objekten und adverbialen Bestimmungen!</p>
         <p><b>Steuerung:</b> Bildschirm antippen oder Leertaste.</p>
-        <p style="margin: 16px 0;">Vogelfarbe:
+        <p style="margin:16px 0;">Vogelfarbe:
           <select id="birdChoice">
             <option value="#ffd447">Gelb 💛</option>
             <option value="#48a9ed">Blau 💙</option>
@@ -166,32 +210,27 @@ select { padding: 10px; border-radius: 10px; border: 1px solid #ccc; font-size: 
       </div>
     </section>
 
-    <!-- Quiz Panel -->
     <section class="panel" id="quizPanel">
       <div class="card">
-        <p style="font-size:13px; color:#666; font-weight:bold;" id="quizReason">📚 GRAMMATIK-CHECK · ⏱️ <span id="timer">15</span>s</p>
-        <h2 id="questionText" style="font-size:17px; margin-top:8px;"></h2>
+        <p style="font-size:13px;color:#666;font-weight:bold;" id="quizReason">📚 GRAMMATIK-CHECK · ⏱️ <span id="timer">15</span>s</p>
+        <h2 id="questionText" style="font-size:17px;margin-top:8px;"></h2>
         <div class="answers" id="answerList"></div>
         <div class="feedback" id="feedback"></div>
         <button class="primary" id="continueBtn" style="display:none">Weiter</button>
       </div>
     </section>
 
-    <!-- Game Over Panel mit Online-Rangliste -->
     <section class="panel" id="endPanel">
       <div class="card">
         <h2>Game Over! 🐤</h2>
         <p id="endText"></p>
-        
-        <div id="scoreInputArea" style="margin: 15px 0;">
-          <input type="text" id="playerName" placeholder="Dein Name" maxlength="15" style="padding: 10px; border-radius: 8px; border: 1px solid #ccc; width: 70%; font-size: 14px;">
-          <button id="saveScoreBtn" style="padding: 10px; margin-top: 5px; background: #4cd97b; color: white; width: 70%; margin-left: auto; margin-right: auto; border-radius: 8px; border: 0; cursor: pointer; font-weight: bold;">Online Speichern</button>
+        <div id="scoreInputArea" style="margin:15px 0;">
+          <input type="text" id="playerName" placeholder="Dein Name" maxlength="15" style="padding:10px;border-radius:8px;border:1px solid #ccc;width:70%;font-size:14px;">
+          <button id="saveScoreBtn" style="padding:10px;margin-top:5px;background:#4cd97b;color:white;width:70%;margin-left:auto;margin-right:auto;border-radius:8px;border:0;cursor:pointer;font-weight:bold;">Online Speichern</button>
         </div>
-
-        <h3 style="font-size: 16px; margin: 15px 0 5px 0;">🏆 Online Top 5 Rangliste</h3>
-        <ol id="highScoreList" style="text-align: left; padding-left: 30px; font-size: 14px; max-height: 120px; overflow-y: auto;"></ol>
-
-        <button class="primary" id="againBtn" style="margin-top: 15px;">Nochmal versuchen ↻</button>
+        <h3 style="font-size:16px;margin:15px 0 5px;">🏆 Online Top 5 Rangliste</h3>
+        <ol id="highScoreList" style="text-align:left;padding-left:30px;font-size:14px;max-height:120px;overflow-y:auto;"></ol>
+        <button class="primary" id="againBtn" style="margin-top:15px;">Nochmal versuchen ↻</button>
       </div>
     </section>
   </div>
@@ -199,37 +238,56 @@ select { padding: 10px; border-radius: 10px; border: 1px solid #ccc; font-size: 
 
 <script>
 (() => {
+"use strict";
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const $ = id => document.getElementById(id);
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
 function playSound(freq, type, duration, slide = 0) {
-  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (audioCtx.state === "suspended") audioCtx.resume();
   try {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = type;
     osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    if (slide) osc.frequency.exponentialRampToValueAtTime(Math.max(10, freq + slide), audioCtx.currentTime + duration);
+    if (slide) {
+      osc.frequency.exponentialRampToValueAtTime(
+        Math.max(10, freq + slide),
+        audioCtx.currentTime + duration
+      );
+    }
     gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
     osc.start();
     osc.stop(audioCtx.currentTime + duration);
-  } catch(e){}
+  } catch(e) {}
 }
 
 const sounds = {
-  jump: () => playSound(400, 'sine', 0.12, 300),
-  coin: () => { playSound(800, 'triangle', 0.08); setTimeout(() => playSound(1200, 'triangle', 0.12), 80); },
-  shield: () => playSound(600, 'sine', 0.25, 400),
-  correct: () => { playSound(523, 'sine', 0.1); setTimeout(() => playSound(659, 'sine', 0.1), 100); setTimeout(() => playSound(783, 'sine', 0.2), 200); },
-  wrong: () => { playSound(300, 'sawtooth', 0.15, -150); setTimeout(() => playSound(200, 'sawtooth', 0.2, -100), 150); }
+  jump: () => playSound(400, "sine", 0.12, 300),
+  coin: () => {
+    playSound(800, "triangle", 0.08);
+    setTimeout(() => playSound(1200, "triangle", 0.12), 80);
+  },
+  shield: () => playSound(600, "sine", 0.25, 400),
+  correct: () => {
+    playSound(523, "sine", 0.1);
+    setTimeout(() => playSound(659, "sine", 0.1), 100);
+    setTimeout(() => playSound(783, "sine", 0.2), 200);
+  },
+  wrong: () => {
+    playSound(300, "sawtooth", 0.15, -150);
+    setTimeout(() => playSound(200, "sawtooth", 0.2, -100), 150);
+  }
 };
 
 let W = 0, H = 0;
+
 function resize() {
   W = canvas.width = canvas.parentElement.clientWidth;
   H = canvas.height = canvas.parentElement.clientHeight;
@@ -282,16 +340,26 @@ function createParticles(x, y, color, count = 8) {
       vy: (Math.random() - 0.5) * 6,
       size: Math.random() * 4 + 2,
       color,
-      life: 1.0
+      life: 1
     });
   }
 }
 
 function reset() {
-  bird = { x: W * 0.25, y: H * 0.4, vy: 0, wing: 0 };
-  pipes = []; items = []; particles = [];
-  score = 0; lives = 3; coins = 0; level = 1; frame = 0; shieldActive = false; lastQuizScore = 0;
-  usedQuestions = []; active = true; quizActive = false;
+  bird = {x:W*0.25,y:H*0.4,vy:0,wing:0};
+  pipes = [];
+  items = [];
+  particles = [];
+  score = 0;
+  lives = 3;
+  coins = 0;
+  level = 1;
+  frame = 0;
+  shieldActive = false;
+  lastQuizScore = 0;
+  usedQuestions = [];
+  active = true;
+  quizActive = false;
   updateHud();
   $("startPanel").style.display = "none";
   $("quizPanel").style.display = "none";
@@ -301,24 +369,28 @@ function reset() {
 function draw() {
   ctx.clearRect(0, 0, W, H);
 
-  ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
-  [[W*0.1, H*0.15], [W*0.5, H*0.22], [W*0.85, H*0.1]].forEach(([x, y]) => {
+  ctx.fillStyle = "rgba(255,255,255,0.55)";
+  [[W*0.1,H*0.15],[W*0.5,H*0.22],[W*0.85,H*0.1]].forEach(([x,y]) => {
     ctx.beginPath();
-    ctx.arc(x, y, 24, 0, Math.PI * 2);
-    ctx.arc(x + 24, y - 6, 30, 0, Math.PI * 2);
-    ctx.arc(x + 48, y, 22, 0, Math.PI * 2);
+    ctx.arc(x,y,24,0,Math.PI*2);
+    ctx.arc(x+24,y-6,30,0,Math.PI*2);
+    ctx.arc(x+48,y,22,0,Math.PI*2);
     ctx.fill();
   });
 
   items.forEach(it => {
     if (!it.collected) {
-      if (it.type === 'coin') {
+      if (it.type === "coin") {
         ctx.fillStyle = "#ffd700";
-        ctx.beginPath(); ctx.arc(it.x, it.y, 11, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = "#e6b800"; ctx.lineWidth = 2; ctx.stroke();
-      } else if (it.type === 'shield') {
+        ctx.beginPath();
+        ctx.arc(it.x,it.y,11,0,Math.PI*2);
+        ctx.fill();
+        ctx.strokeStyle = "#e6b800";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      } else if (it.type === "shield") {
         ctx.font = "20px Arial";
-        ctx.fillText("🛡️", it.x - 10, it.y + 7);
+        ctx.fillText("🛡️",it.x-10,it.y+7);
       }
     }
   });
@@ -326,75 +398,96 @@ function draw() {
   particles.forEach(p => {
     ctx.fillStyle = p.color;
     ctx.globalAlpha = p.life;
-    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+    ctx.fill();
   });
-  ctx.globalAlpha = 1.0;
+  ctx.globalAlpha = 1;
 
   pipes.forEach(p => {
     ctx.fillStyle = "#218e54";
-    ctx.fillRect(p.x, 0, p.w, p.top);
-    ctx.fillRect(p.x, p.bottom, p.w, H - p.bottom - 45);
-
+    ctx.fillRect(p.x,0,p.w,p.top);
+    ctx.fillRect(p.x,p.bottom,p.w,H-p.bottom-45);
     ctx.fillStyle = "#176d42";
-    ctx.fillRect(p.x - 5, p.top - 22, p.w + 10, 22);
-    ctx.fillRect(p.x - 5, p.bottom, p.w + 10, 22);
+    ctx.fillRect(p.x-5,p.top-22,p.w+10,22);
+    ctx.fillRect(p.x-5,p.bottom,p.w+10,22);
   });
 
-  ctx.fillStyle = "#5ca843"; ctx.fillRect(0, H - 45, W, 45);
-  ctx.fillStyle = "#3e7a2b"; ctx.fillRect(0, H - 45, W, 7);
+  ctx.fillStyle = "#5ca843";
+  ctx.fillRect(0,H-45,W,45);
+  ctx.fillStyle = "#3e7a2b";
+  ctx.fillRect(0,H-45,W,7);
 
   ctx.save();
-  ctx.translate(bird.x, bird.y);
-  ctx.rotate(Math.max(-0.4, Math.min(0.6, bird.vy * 0.06)));
-  
+  ctx.translate(bird.x,bird.y);
+  ctx.rotate(Math.max(-0.4,Math.min(0.6,bird.vy*0.06)));
+
   if (shieldActive) {
     ctx.strokeStyle = "#00d2ff";
     ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(0, 0, 24, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0,0,24,0,Math.PI*2);
+    ctx.stroke();
   }
 
   ctx.fillStyle = skinColor;
-  ctx.beginPath(); ctx.ellipse(0, 0, 19, 15, 0, 0, Math.PI * 2); ctx.fill();
-  
-  bird.wing += 0.25;
-  let wingY = Math.sin(bird.wing) * 5;
-  ctx.fillStyle = "rgba(0,0,0,0.15)";
-  ctx.beginPath(); ctx.ellipse(-4, wingY, 8, 5, 0.2, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(0,0,19,15,0,0,Math.PI*2);
+  ctx.fill();
 
-  ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(7, -5, 6.5, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = "#17324d"; ctx.beginPath(); ctx.arc(9, -5, 3, 0, Math.PI * 2); ctx.fill();
+  bird.wing += 0.25;
+  const wingY = Math.sin(bird.wing)*5;
+  ctx.fillStyle = "rgba(0,0,0,0.15)";
+  ctx.beginPath();
+  ctx.ellipse(-4,wingY,8,5,0.2,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle = "white";
+  ctx.beginPath();
+  ctx.arc(7,-5,6.5,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle = "#17324d";
+  ctx.beginPath();
+  ctx.arc(9,-5,3,0,Math.PI*2);
+  ctx.fill();
+
   ctx.fillStyle = "#f18435";
-  ctx.beginPath(); ctx.moveTo(15, 0); ctx.lineTo(26, 4); ctx.lineTo(15, 8); ctx.fill();
-  
+  ctx.beginPath();
+  ctx.moveTo(15,0);
+  ctx.lineTo(26,4);
+  ctx.lineTo(15,8);
+  ctx.fill();
   ctx.restore();
 }
 
 function addPipe() {
-  const gap = Math.max(135, 175 - level * 4);
+  const gap = Math.max(135,175-level*4);
   const minTop = 60;
-  const maxTop = H - 45 - gap - 70;
-  const top = minTop + Math.random() * (maxTop - minTop);
+  const maxTop = H-45-gap-70;
+  const top = minTop + Math.random()*(maxTop-minTop);
   const w = 65;
-  pipes.push({ x: W + 10, w, top, bottom: top + gap, passed: false });
+  pipes.push({x:W+10,w,top,bottom:top+gap,passed:false});
 
-  let rand = Math.random();
+  const rand = Math.random();
   if (rand > 0.7) {
-    items.push({ x: W + 10 + w/2, y: top + gap/2, type: 'shield', collected: false });
+    items.push({x:W+10+w/2,y:top+gap/2,type:"shield",collected:false});
   } else if (rand > 0.3) {
-    items.push({ x: W + 10 + w/2, y: top + gap/2, type: 'coin', collected: false });
+    items.push({x:W+10+w/2,y:top+gap/2,type:"coin",collected:false});
   }
 }
 
 function collision() {
-  if (bird.y + 13 >= H - 45 || bird.y - 13 <= 0) return true;
+  if (bird.y+13 >= H-45 || bird.y-13 <= 0) return true;
   return pipes.some(p =>
-    bird.x + 15 > p.x && bird.x - 15 < p.x + p.w &&
-    (bird.y - 13 < p.top || bird.y + 13 > p.bottom)
+    bird.x+15 > p.x && bird.x-15 < p.x+p.w &&
+    (bird.y-13 < p.top || bird.y+13 > p.bottom)
   );
 }
 
 function tick() {
   if (!active || quizActive) return;
+
   frame++;
   bird.vy += 0.45;
   bird.y += bird.vy;
@@ -402,37 +495,41 @@ function tick() {
   if (frame % 90 === 1) addPipe();
 
   particles.forEach(p => {
-    p.x += p.vx; p.y += p.vy; p.life -= 0.03;
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= 0.03;
   });
   particles = particles.filter(p => p.life > 0);
 
   items.forEach(it => {
-    if (!it.collected && Math.hypot(bird.x - it.x, bird.y - it.y) < 28) {
+    if (!it.collected && Math.hypot(bird.x-it.x,bird.y-it.y) < 28) {
       it.collected = true;
-      if (it.type === 'coin') {
+      if (it.type === "coin") {
         coins++;
         sounds.coin();
-        createParticles(it.x, it.y, "#ffd700", 6);
-      } else if (it.type === 'shield') {
+        createParticles(it.x,it.y,"#ffd700",6);
+      } else if (it.type === "shield") {
         shieldActive = true;
         sounds.shield();
-        createParticles(it.x, it.y, "#00d2ff", 10);
+        createParticles(it.x,it.y,"#00d2ff",10);
       }
       updateHud();
     }
-    it.x -= 2.6 + Math.min(level * 0.2, 2);
+    it.x -= 2.6 + Math.min(level*0.2,2);
   });
 
   pipes.forEach(p => {
-    p.x -= 2.6 + Math.min(level * 0.2, 2);
-    if (!p.passed && p.x + p.w < bird.x) {
+    p.x -= 2.6 + Math.min(level*0.2,2);
+    if (!p.passed && p.x+p.w < bird.x) {
       p.passed = true;
       score++;
+
       if (score > best) {
         best = score;
-        localStorage.setItem("satzgliederFlappyBest", best);
+        localStorage.setItem("satzgliederFlappyBest",best);
       }
-      level = 1 + Math.floor(score / 5);
+
+      level = 1 + Math.floor(score/5);
       updateHud();
 
       if (score > 0 && score % 5 === 0 && score !== lastQuizScore) {
@@ -445,11 +542,11 @@ function tick() {
 
   pipes = pipes.filter(p => p.x > -80);
   items = items.filter(it => it.x > -30);
-  
+
   draw();
 
   if (collision()) {
-    createParticles(bird.x, bird.y, "#ff4444", 12);
+    createParticles(bird.x,bird.y,"#ff4444",12);
     if (shieldActive) {
       shieldActive = false;
       sounds.shield();
@@ -459,6 +556,7 @@ function tick() {
       return;
     }
   }
+
   requestAnimationFrame(tick);
 }
 
@@ -471,11 +569,9 @@ function fly(e) {
 }
 
 function pickQuestion() {
-  if (usedQuestions.length >= questions.length) {
-    usedQuestions = [];
-  }
-  const available = questions.map((_, i) => i).filter(i => !usedQuestions.includes(i));
-  const n = available[Math.floor(Math.random() * available.length)];
+  if (usedQuestions.length >= questions.length) usedQuestions = [];
+  const available = questions.map((_,i) => i).filter(i => !usedQuestions.includes(i));
+  const n = available[Math.floor(Math.random()*available.length)];
   usedQuestions.push(n);
   return n;
 }
@@ -485,10 +581,10 @@ function openQuiz(isCheckpoint = false) {
   questionIndex = pickQuestion();
   const q = questions[questionIndex];
 
-  $("quizReason").textContent = isCheckpoint 
-    ? `⭐ LEVEL ${level} CHECKPOINT · ⏱️ ` 
-    : `📚 GRAMMATIK-CHECK · ⏱️ `;
-    
+  $("quizReason").textContent = isCheckpoint
+    ? `⭐ LEVEL ${level} CHECKPOINT · ⏱️ `
+    : "📚 GRAMMATIK-CHECK · ⏱️ ";
+
   const timerSpan = document.createElement("span");
   timerSpan.id = "timer";
   timerSpan.textContent = "15";
@@ -501,13 +597,16 @@ function openQuiz(isCheckpoint = false) {
   $("feedback").style.background = "transparent";
   $("continueBtn").style.display = "none";
 
-  let shuffledAnswers = q.a.map((ans, idx) => ({ text: ans, originalIndex: idx }));
-  shuffledAnswers.sort(() => Math.random() - 0.5);
+  const shuffledAnswers = q.a.map((ans,idx) => ({
+    text:ans,
+    originalIndex:idx
+  }));
+  shuffledAnswers.sort(() => Math.random()-0.5);
 
-  shuffledAnswers.forEach((item, i) => {
+  shuffledAnswers.forEach((item,i) => {
     const b = document.createElement("button");
-    b.textContent = ["A", "B", "C"][i] + ") " + item.text;
-    b.onclick = () => checkAnswer(item.originalIndex, q.c, isCheckpoint);
+    b.textContent = ["A","B","C"][i] + ") " + item.text;
+    b.onclick = () => checkAnswer(item.originalIndex,q.c,isCheckpoint);
     $("answerList").appendChild(b);
   });
 
@@ -517,26 +616,28 @@ function openQuiz(isCheckpoint = false) {
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     questionTimer--;
-    if($("timer")) $("timer").textContent = questionTimer;
+    if ($("timer")) $("timer").textContent = questionTimer;
     if (questionTimer <= 0) {
       clearInterval(timerInterval);
-      checkAnswer(-1, q.c, isCheckpoint);
+      checkAnswer(-1,q.c,isCheckpoint);
     }
-  }, 1000);
+  },1000);
 }
 
-function checkAnswer(selectedIndex, correctIndex, isCheckpoint) {
+function checkAnswer(selectedIndex,correctIndex,isCheckpoint) {
   if (!quizActive || $("continueBtn").style.display !== "none") return;
 
   clearInterval(timerInterval);
   const q = questions[questionIndex];
   const buttons = [...$("answerList").children];
 
-  buttons.forEach((b) => {
+  buttons.forEach(b => {
     b.disabled = true;
     if (b.textContent.includes(q.a[correctIndex])) {
       b.classList.add("correct");
-    } else if (b.textContent.includes(q.a[selectedIndex]) && selectedIndex !== correctIndex) {
+    } else if (selectedIndex >= 0 &&
+               b.textContent.includes(q.a[selectedIndex]) &&
+               selectedIndex !== correctIndex) {
       b.classList.add("wrong");
     }
   });
@@ -546,21 +647,25 @@ function checkAnswer(selectedIndex, correctIndex, isCheckpoint) {
     $("feedback").textContent = "Richtig! ⭐ " + q.e;
     $("feedback").style.color = "#0d5926";
     $("feedback").style.background = "#c9f4d8";
-    $("continueBtn").textContent = isCheckpoint ? "Weiter ins nächste Level 🚀" : "Weiterfliegen 🚀";
+    $("continueBtn").textContent = isCheckpoint
+      ? "Weiter ins nächste Level 🚀"
+      : "Weiterfliegen 🚀";
     $("continueBtn").onclick = continueGame;
   } else {
     sounds.wrong();
     lives--;
     updateHud();
-    
-    if(lives <= 0) {
+
+    if (lives <= 0) {
       $("feedback").textContent = "Leider falsch. " + q.e;
       $("feedback").style.color = "#7a1c08";
       $("feedback").style.background = "#ffe0d9";
       $("continueBtn").textContent = "Ergebnis anzeigen 🏁";
       $("continueBtn").onclick = gameOver;
     } else {
-      $("feedback").textContent = (selectedIndex === -1 ? "Zeit abgelaufen! " : "Falsch! ") + q.e + " Du verlierst 1 Leben! ❤️";
+      $("feedback").textContent =
+        (selectedIndex === -1 ? "Zeit abgelaufen! " : "Falsch! ") +
+        q.e + " Du verlierst 1 Leben! ❤️";
       $("feedback").style.color = "#7a1c08";
       $("feedback").style.background = "#ffe0d9";
       $("continueBtn").textContent = "Trotzdem weiter 🩹";
@@ -574,103 +679,276 @@ function checkAnswer(selectedIndex, correctIndex, isCheckpoint) {
 function continueGame() {
   $("quizPanel").style.display = "none";
   quizActive = false;
-  bird.y = H * 0.4;
+  bird.y = H*0.4;
   bird.vy = 0;
-  pipes = []; items = [];
+  pipes = [];
+  items = [];
   frame = 0;
   draw();
   requestAnimationFrame(tick);
 }
 
 // ==========================================
-// npoint.io Online-Rangliste (Über Proxy-Umleitung)
+// npoint.io Online-Rangliste
+// Sicheres Laden/Speichern mit lokaler Warteschlange
 // ==========================================
+
 const npointUrl = "https://api.npoint.io/c3a2fbf32a028bb057a1";
-const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(npointUrl);
+const pendingScoresKey = "flappyPendingOnlineScores";
+let leaderboardBusy = false;
 
-function loadNPointLeaderboard() {
-  fetch(proxyUrl)
-  .then(response => {
-    if (!response.ok) throw new Error("Laden fehlgeschlagen");
-    return response.json();
-  })
-  .then(data => {
-    let scores = (data && data.scores) ? data.scores : [];
-    const listElement = document.getElementById("highScoreList");
-    listElement.innerHTML = "";
+function readPendingScores() {
+  try {
+    const value = JSON.parse(localStorage.getItem(pendingScoresKey) || "[]");
+    return Array.isArray(value) ? value : [];
+  } catch (error) {
+    console.warn("Lokale Warteschlange konnte nicht gelesen werden:",error);
+    return [];
+  }
+}
 
-    if (scores.length === 0) {
-      listElement.innerHTML = "<li style='list-style: none; text-align: center; color: #777;'>Noch keine Einträge</li>";
-      return;
+function queueScore(name,value) {
+  const pending = readPendingScores();
+  const index = pending.findIndex(item =>
+    String(item.name || "").toLowerCase() === name.toLowerCase()
+  );
+
+  if (index >= 0) {
+    pending[index].score = Math.max(Number(pending[index].score)||0,value);
+  } else {
+    pending.push({name,score:value});
+  }
+
+  localStorage.setItem(pendingScoresKey,JSON.stringify(pending));
+}
+
+async function getOnlineScores() {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(),12000);
+
+  try {
+    const response = await fetch(npointUrl,{
+      method:"GET",
+      cache:"no-store",
+      signal:controller.signal
+    });
+
+    if (!response.ok) {
+      throw new Error("Server antwortet mit HTTP " + response.status);
     }
 
-    scores.sort((a, b) => b.score - a.score);
-    scores.slice(0, 5).forEach((item, index) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<b>${index + 1}. ${item.name}</b>: ${item.score} Pkt.`;
-      listElement.appendChild(li);
-    });
-  })
-  .catch(error => {
-    console.log("Fehler beim Laden:", error);
-    const listElement = document.getElementById("highScoreList");
-    listElement.innerHTML = "<li style='list-style: none; text-align: center; color: #777;'>Rangliste kurz nicht erreichbar</li>";
+    const data = await response.json();
+
+    if (!data || !Array.isArray(data.scores)) {
+      throw new Error("Die Antwort der Rangliste hat ein unerwartetes Format.");
+    }
+
+    return data.scores;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function renderLeaderboard(scores) {
+  const listElement = $("highScoreList");
+  listElement.innerHTML = "";
+
+  const sorted = [...scores].sort(
+    (a,b) => Number(b.score)-Number(a.score)
+  );
+
+  if (sorted.length === 0) {
+    listElement.innerHTML =
+      "<li style='list-style:none;text-align:center;color:#777;'>Noch keine Einträge</li>";
+    return;
+  }
+
+  sorted.slice(0,5).forEach((item,index) => {
+    const li = document.createElement("li");
+    const name = document.createElement("b");
+
+    name.textContent = (index+1) + ". " + String(item.name || "Unbekannt");
+    li.appendChild(name);
+    li.appendChild(
+      document.createTextNode(": " + Number(item.score || 0) + " Pkt.")
+    );
+    listElement.appendChild(li);
   });
 }
 
-function saveNPointScore(newName, newScore) {
-  const trimmedName = newName.trim();
+async function loadNPointLeaderboard() {
+  try {
+    const scores = await getOnlineScores();
+    renderLeaderboard(scores);
+  } catch (error) {
+    console.warn("Online-Rangliste konnte nicht geladen werden:",error);
+    $("highScoreList").innerHTML =
+      "<li style='list-style:none;text-align:center;color:#777;'>Online-Rangliste momentan nicht erreichbar. Dein lokaler Rekord bleibt erhalten.</li>";
+  }
+}
+
+function mergeScore(scores,newEntry) {
+  const result = [...scores];
+
+  const index = result.findIndex(item =>
+    String(item.name || "").toLowerCase() === newEntry.name.toLowerCase()
+  );
+
+  if (index >= 0) {
+    result[index] = {
+      ...result[index],
+      name:newEntry.name,
+      score:Math.max(
+        Number(result[index].score)||0,
+        Number(newEntry.score)||0
+      )
+    };
+  } else {
+    result.push({
+      name:newEntry.name,
+      score:Number(newEntry.score)||0
+    });
+  }
+
+  return result
+    .filter(item =>
+      item &&
+      typeof item.name === "string" &&
+      Number.isFinite(Number(item.score))
+    )
+    .sort((a,b) => Number(b.score)-Number(a.score))
+    .slice(0,5);
+}
+
+async function putOnlineScores(scores) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(),12000);
+
+  try {
+    const response = await fetch(npointUrl,{
+      method:"PUT",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({scores}),
+      signal:controller.signal
+    });
+
+    if (!response.ok) {
+      throw new Error("Speichern fehlgeschlagen (HTTP " + response.status + ")");
+    }
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function saveNPointScore(newName,newScore) {
+  const trimmedName = String(newName || "").trim().slice(0,15);
+  const numericScore = Number(newScore);
+
   if (!trimmedName) {
     alert("Bitte gib einen Namen ein!");
     return;
   }
 
-  localStorage.setItem("flappyPlayerName", trimmedName);
+  if (!Number.isFinite(numericScore) || numericScore < 0) {
+    alert("Der Punktestand ist ungültig.");
+    return;
+  }
 
-  // Zuerst aktuelle Liste holen, Score hinzufügen und per PUT speichern
-  fetch(npointUrl)
-    .catch(() => ({ json: () => ({ scores: [] }) }))
-    .then(res => res.json ? res.json() : { scores: [] })
-    .catch(() => ({ scores: [] }))
-    .then(data => {
-      let scores = (data && data.scores) ? data.scores : [];
+  localStorage.setItem("flappyPlayerName",trimmedName);
 
-      const existingIndex = scores.findIndex(item => item.name.toLowerCase() === trimmedName.toLowerCase());
-      if (existingIndex !== -1) {
-        if (newScore > scores[existingIndex].score) {
-          scores[existingIndex].score = newScore;
-        }
-      } else {
-        scores.push({ name: trimmedName, score: newScore });
-      }
-      
-      scores.sort((a, b) => b.score - a.score);
-      scores = scores.slice(0, 5);
+  const button = $("saveScoreBtn");
+  button.disabled = true;
+  button.textContent = "Wird gespeichert …";
 
-      return fetch(npointUrl, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ scores: scores })
-      });
-    })
-    .then(res => {
-      alert("Score erfolgreich online gespeichert! 🎉");
-      $("scoreInputArea").style.display = "none";
-      loadNPointLeaderboard();
-    })
-    .catch(err => {
-      console.log("Speicherfehler:", err);
-      alert("Score erfolgreich gespeichert!");
-      $("scoreInputArea").style.display = "none";
-      loadNPointLeaderboard();
-    });
+  try {
+    // Erst lesen, dann ändern.
+    // Bei Lesefehler niemals eine leere Liste hochladen.
+    const currentScores = await getOnlineScores();
+
+    const updatedScores = mergeScore(
+      currentScores,
+      {name:trimmedName,score:numericScore}
+    );
+
+    await putOnlineScores(updatedScores);
+
+    const pending = readPendingScores().filter(item =>
+      String(item.name || "").toLowerCase() !== trimmedName.toLowerCase()
+    );
+
+    localStorage.setItem(pendingScoresKey,JSON.stringify(pending));
+
+    alert("Score wurde vom Server bestätigt und online gespeichert! 🎉");
+    $("scoreInputArea").style.display = "none";
+    renderLeaderboard(updatedScores);
+
+  } catch (error) {
+    console.warn("Online-Speichern fehlgeschlagen:",error);
+
+    try {
+      queueScore(trimmedName,numericScore);
+
+      alert(
+        "Online-Speichern momentan nicht möglich. " +
+        "Dein Score wurde auf diesem Gerät zwischengespeichert. " +
+        "Bitte später erneut versuchen.\n\n" +
+        "Dein lokaler Rekord bleibt erhalten."
+      );
+
+    } catch (storageError) {
+      alert(
+        "Online-Speichern fehlgeschlagen und die lokale " +
+        "Zwischenspeicherung ist nicht verfügbar. " +
+        "Bitte lösche keine Browserdaten und versuche es später erneut."
+      );
+    }
+
+  } finally {
+    button.disabled = false;
+    button.textContent = "Online Speichern";
+  }
 }
 
-// Event-Listener für den Speicher-Button
+async function retryPendingScores() {
+  if (leaderboardBusy || !navigator.onLine) return;
+
+  const pending = readPendingScores();
+  if (pending.length === 0) return;
+
+  leaderboardBusy = true;
+
+  try {
+    // Bestehende Rangliste zuerst lesen.
+    let scores = await getOnlineScores();
+
+    for (const entry of pending) {
+      scores = mergeScore(scores,entry);
+    }
+
+    await putOnlineScores(scores);
+    localStorage.removeItem(pendingScoresKey);
+    renderLeaderboard(scores);
+
+    console.info("Zwischengespeicherte Scores wurden online übertragen.");
+
+  } catch (error) {
+    console.warn(
+      "Erneuter Upload der zwischengespeicherten Scores fehlgeschlagen:",
+      error
+    );
+  } finally {
+    leaderboardBusy = false;
+  }
+}
+
+window.addEventListener("online",retryPendingScores);
+
 $("saveScoreBtn").onclick = () => {
   const savedName = localStorage.getItem("flappyPlayerName");
-  const nameToUse = savedName || $("playerName").value;
-  saveNPointScore(nameToUse, score);
+  const typedName = $("playerName").value.trim();
+  const nameToUse = typedName || savedName || "";
+
+  saveNPointScore(nameToUse,score);
 };
 
 function gameOver() {
@@ -678,8 +956,9 @@ function gameOver() {
   $("quizPanel").style.display = "none";
   $("endPanel").style.display = "flex";
   $("endText").innerHTML = `Du hast <b>${score} Punkte</b> erzielt!`;
-  
+
   const savedName = localStorage.getItem("flappyPlayerName");
+
   if (savedName) {
     $("playerName").style.display = "none";
     $("saveScoreBtn").textContent = `Als "${savedName}" Speichern`;
@@ -691,6 +970,7 @@ function gameOver() {
 
   $("scoreInputArea").style.display = "block";
   loadNPointLeaderboard();
+  retryPendingScores();
 }
 
 function start() {
@@ -701,15 +981,22 @@ function start() {
 
 $("startBtn").onclick = start;
 $("againBtn").onclick = start;
-$("birdChoice").onchange = e => { skinColor = e.target.value; };
 
-window.addEventListener("pointerdown", (e) => {
-  if (e.target.tagName !== "BUTTON" && e.target.tagName !== "SELECT" && e.target.tagName !== "INPUT") {
+$("birdChoice").onchange = e => {
+  skinColor = e.target.value;
+};
+
+window.addEventListener("pointerdown",e => {
+  if (
+    e.target.tagName !== "BUTTON" &&
+    e.target.tagName !== "SELECT" &&
+    e.target.tagName !== "INPUT"
+  ) {
     fly(e);
   }
 });
 
-document.addEventListener("keydown", e => {
+document.addEventListener("keydown",e => {
   if (e.code === "Space" || e.code === "ArrowUp") {
     fly(e);
   }
