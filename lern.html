@@ -1,0 +1,800 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LEARN ARENA – Die Lernwelt</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    color: white;
+    background: radial-gradient(circle at top, #263b58, #101522 75%);
+}
+
+header {
+    text-align: center;
+    padding: 30px 15px 15px;
+}
+
+header h1 {
+    font-size: 42px;
+    margin: 0;
+    color: #55e6ff;
+    text-shadow: 0 0 18px #00bfff;
+}
+
+header p {
+    color: #b9c9dc;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px;
+}
+
+.subjects {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.subject {
+    background: linear-gradient(145deg, #263b58, #182338);
+    border: 2px solid #3c5c80;
+    border-radius: 18px;
+    padding: 25px 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: .2s;
+    box-shadow: 0 8px 20px #0005;
+}
+
+.subject:hover {
+    transform: translateY(-6px) scale(1.02);
+    border-color: #55e6ff;
+    box-shadow: 0 0 20px #00bfff66;
+}
+
+.subject .emoji {
+    font-size: 55px;
+}
+
+.subject h2 {
+    margin: 12px 0 5px;
+}
+
+.subject p {
+    color: #b9c9dc;
+}
+
+button {
+    border: none;
+    border-radius: 12px;
+    padding: 13px 22px;
+    background: #00bfff;
+    color: #061522;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+button:hover {
+    background: #55e6ff;
+    transform: scale(1.04);
+}
+
+button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+#game, #end {
+    display: none;
+}
+
+.panel {
+    background: linear-gradient(145deg, #263b58, #182338);
+    border: 2px solid #3c5c80;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 8px 25px #0005;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat {
+    background: #101c30;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-weight: bold;
+}
+
+#timer {
+    color: #55e6ff;
+}
+
+.timer-bg {
+    height: 12px;
+    background: #101522;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 25px;
+}
+
+#bar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #00e676, #55e6ff);
+    transition: width 1s linear;
+}
+
+#question {
+    font-size: 25px;
+    text-align: center;
+    margin: 30px 0;
+    min-height: 60px;
+}
+
+.answers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+}
+
+.answer {
+    background: #334b6b;
+    color: white;
+    border: 2px solid #55769d;
+    min-height: 65px;
+}
+
+.answer:hover {
+    background: #45658e;
+}
+
+.answer.correct {
+    background: #087f43;
+    border-color: #00e676;
+    color: white;
+}
+
+.answer.wrong {
+    background: #a32135;
+    border-color: #ff5368;
+    color: white;
+}
+
+#feedback {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 22px 0;
+    min-height: 25px;
+}
+
+.game-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#end {
+    text-align: center;
+}
+
+#end h2 {
+    font-size: 36px;
+    color: #55e6ff;
+}
+
+#endScore {
+    font-size: 32px;
+    color: #00e676;
+    font-weight: bold;
+}
+
+.small {
+    color: #b9c9dc;
+    font-size: 14px;
+}
+
+@media(max-width: 600px) {
+    header h1 {
+        font-size: 30px;
+    }
+
+    #question {
+        font-size: 21px;
+    }
+
+    .panel {
+        padding: 16px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>⚡ LEARN ARENA ⚡</h1>
+    <p>Deine Lernwelt – Lerne und sammle Punkte!</p>
+</header>
+
+<div class="container">
+
+    <section id="home">
+        <h2 style="text-align:center">🎮 Wähle dein Fach</h2>
+        <p style="text-align:center;color:#b9c9dc">
+            30 Fragen · 15 Sekunden pro Frage · 3 Leben
+        </p>
+
+        <div class="subjects">
+
+            <div class="subject" onclick="startGame('Mathe')">
+                <div class="emoji">➗</div>
+                <h2>Mathe</h2>
+                <p>Rechnen und Knobeln</p>
+            </div>
+
+            <div class="subject" onclick="startGame('Deutsch')">
+                <div class="emoji">📚</div>
+                <h2>Deutsch</h2>
+                <p>Grammatik und Sprache</p>
+            </div>
+
+            <div class="subject" onclick="startGame('Englisch')">
+                <div class="emoji">🇬🇧</div>
+                <h2>Englisch</h2>
+                <p>Vokabeln und Grammatik</p>
+            </div>
+
+            <div class="subject" onclick="startGame('Erdkunde')">
+                <div class="emoji">🌍</div>
+                <h2>Erdkunde</h2>
+                <p>Die Welt entdecken</p>
+            </div>
+
+            <div class="subject" onclick="startGame('NAWI')">
+                <div class="emoji">🧬</div>
+                <h2>NAWI</h2>
+                <p>Tiere, Pflanzen und Natur</p>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="game">
+        <div class="panel">
+
+            <h2 id="gameTitle" style="text-align:center"></h2>
+
+            <div class="stats">
+                <div class="stat">⭐ Punkte: <span id="score">0</span></div>
+                <div class="stat">❤️ Leben: <span id="lives">3</span></div>
+                <div class="stat">⏱️ Zeit: <span id="timer">15</span>s</div>
+                <div class="stat">📝 Frage: <span id="number">1</span>/30</div>
+            </div>
+
+            <div class="timer-bg">
+                <div id="bar"></div>
+            </div>
+
+            <h2 id="question"></h2>
+
+            <div class="answers" id="answers"></div>
+
+            <div id="feedback"></div>
+
+            <div class="game-bottom">
+                <span class="small" id="progress">Frage 1 von 30</span>
+                <button id="nextBtn" onclick="nextQuestion()" disabled>
+                    Weiter ➜
+                </button>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="end">
+        <div class="panel">
+            <h2>🏆 Spiel beendet!</h2>
+            <p id="endMessage"></p>
+            <p>Deine Punktzahl:</p>
+            <div id="endScore"></div>
+            <p id="endDetails" class="small"></p>
+            <br>
+            <button onclick="backHome()">🏠 Zurück zur Auswahl</button>
+            <button onclick="restartGame()">🔄 Nochmal spielen</button>
+        </div>
+    </section>
+
+</div>
+
+
+<script>
+
+const quizzes = {
+
+Mathe: [
+
+["Wie viel ist 125 + 75?",["200","190","210"],0],
+["Wie viel ist 300 - 145?",["145","155","165"],1],
+["Wie viel ist 12 × 8?",["86","94","96"],2],
+["Wie viel ist 144 : 12?",["12","14","10"],0],
+["Was ist die Hälfte von 86?",["42","43","46"],1],
+["Wie viel ist 7 × 9?",["56","63","72"],1],
+["Wie viel ist 250 + 350?",["500","550","600"],2],
+["Wie viel ist 1000 - 375?",["625","675","725"],0],
+["Was ist 1/2 von 60?",["20","30","40"],1],
+["Wie viel ist 15 × 4?",["50","60","70"],1],
+["Wie viel ist 81 : 9?",["8","9","10"],1],
+["Wie viel ist 25 × 4?",["80","90","100"],2],
+["Wie viel ist 3/4 von 100?",["25","50","75"],2],
+["Wie viele Zentimeter sind 2 Meter?",["20","200","2000"],1],
+["Wie viele Minuten sind 2 Stunden?",["100","120","180"],1],
+["Wie viel ist 9 × 11?",["99","89","109"],0],
+["Wie viel ist 500 : 10?",["5","50","5000"],1],
+["Welche Zahl ist größer?",["0,7","0,5","0,3"],0],
+["Wie viel ist 2,5 + 1,5?",["3","4","5"],1],
+["Wie viel ist 10 × 10?",["100","1000","10"],0],
+["Wie viele Seiten hat ein Sechseck?",["5","6","8"],1],
+["Wie groß ist ein rechter Winkel?",["45°","90°","180°"],1],
+["Wie viel ist 1/4 von 80?",["10","20","40"],1],
+["Wie viel ist 200 : 5?",["20","40","50"],1],
+["Wie viel ist 13 × 3?",["36","39","42"],1],
+["Wie viele Millimeter sind 1 Zentimeter?",["10","100","1000"],0],
+["Wie viel ist 75 + 125?",["175","200","225"],1],
+["Was ist die kleinste Primzahl?",["1","2","3"],1],
+["Wie viel ist 6 × 12?",["62","72","82"],1],
+["Wie viel ist 100 - 37?",["63","67","73"],0]
+
+],
+
+Deutsch: [
+
+["Was ist ein Nomen?",["Ein Namenwort","Ein Tunwort","Ein Wiewort"],0],
+["Welches Wort ist ein Verb?",["schön","laufen","Haus"],1],
+["Welches Wort ist ein Adjektiv?",["schnell","Tisch","springen"],0],
+["Was ist die Mehrzahl von Haus?",["Häuser","Hauser","Hausen"],0],
+["Welches Satzzeichen steht am Ende einer Frage?",["Punkt","Komma","Fragezeichen"],2],
+["Was ist das Gegenteil von hell?",["dunkel","laut","warm"],0],
+["Welches Wort ist richtig geschrieben?",["Fahrrad","Farad","Farrad"],0],
+["Was ist die Vergangenheit von gehen?",["gegeht","ging","geht"],1],
+["Welches Wort ist ein Artikel?",["der","schnell","rennen"],0],
+["Was ist ein Synonym für fröhlich?",["traurig","glücklich","wütend"],1],
+["Welches Wort ist ein Pronomen?",["ich","laufen","schön"],0],
+["Wie beginnt ein Nomen?",["Klein","Groß","Immer mit Zahl"],1],
+["Was ist die Mehrzahl von Maus?",["Mäuse","Mausen","Mause"],0],
+["Welches Wort ist ein Adjektiv?",["blau","Buch","lesen"],0],
+["Was ist das Gegenteil von mutig?",["tapfer","ängstlich","stark"],1],
+["Wie heißt die Grundform von schrieb?",["schreiben","geschrieben","schreibt"],0],
+["Welches Satzzeichen beendet einen Aussagesatz?",["Fragezeichen","Punkt","Doppelpunkt"],1],
+["Was ist ein zusammengesetztes Nomen?",["Haustür","laufen","klein"],0],
+["Welches Wort ist ein Verb?",["schlafen","schön","Stuhl"],0],
+["Was ist die Einzahl von Kinder?",["Kind","Kinde","Kindern"],0],
+["Welches Wort ist richtig geschrieben?",["nähmlich","nämlich","nehmlich"],1],
+["Was ist ein Märchen?",["Eine erfundene Geschichte","Ein Wetterbericht","Ein Kochrezept"],0],
+["Was ist das Gegenteil von breit?",["lang","schmal","hoch"],1],
+["Welches Wort ist ein Artikel?",["eine","springen","grün"],0],
+["Wie heißt die Vergangenheit von essen?",["aß","isst","gegessen"],0],
+["Was ist ein Reim?",["Ähnlicher Klang am Wortende","Ein Satzzeichen","Ein langer Satz"],0],
+["Welches Wort ist ein Nomen?",["Freundschaft","freundlich","befreunden"],0],
+["Was ist das Gegenteil von leise?",["still","laut","ruhig"],1],
+["Wie nennt man die wörtliche Rede?",["Direkte Rede","Vergangenheit","Mehrzahl"],0],
+["Welches Wort ist ein Adjektiv?",["mutig","Mut","ermutigen"],0]
+
+],
+
+Englisch: [
+
+["Was bedeutet 'apple'?",["Apfel","Birne","Banane"],0],
+["Was bedeutet 'house'?",["Auto","Haus","Schule"],1],
+["Was bedeutet 'dog'?",["Katze","Hund","Pferd"],1],
+["Was bedeutet 'school'?",["Schule","Spielplatz","Küche"],0],
+["Was bedeutet 'blue'?",["Rot","Grün","Blau"],2],
+["Was bedeutet 'book'?",["Buch","Stift","Tisch"],0],
+["Was bedeutet 'water'?",["Milch","Wasser","Saft"],1],
+["Was bedeutet 'mother'?",["Vater","Schwester","Mutter"],2],
+["Was bedeutet 'good morning'?",["Guten Abend","Guten Morgen","Gute Nacht"],1],
+["Was bedeutet 'cat'?",["Katze","Hund","Maus"],0],
+["Was bedeutet 'red'?",["Gelb","Rot","Schwarz"],1],
+["Was bedeutet 'friend'?",["Feind","Lehrer","Freund"],2],
+["Was bedeutet 'to play'?",["spielen","schlafen","essen"],0],
+["Was bedeutet 'sun'?",["Mond","Sonne","Stern"],1],
+["Was bedeutet 'bread'?",["Brot","Käse","Wurst"],0],
+["Was bedeutet 'green'?",["Blau","Grün","Weiß"],1],
+["Was bedeutet 'father'?",["Mutter","Bruder","Vater"],2],
+["Was bedeutet 'small'?",["klein","groß","schnell"],0],
+["Was bedeutet 'big'?",["klein","groß","alt"],1],
+["Was bedeutet 'thank you'?",["Bitte","Hallo","Danke"],2],
+["Was bedeutet 'I am'?",["Ich bin","Du bist","Er ist"],0],
+["Was bedeutet 'we'?",["sie","wir","ihr"],1],
+["Was bedeutet 'Monday'?",["Sonntag","Dienstag","Montag"],2],
+["Was bedeutet 'schoolbag'?",["Schultasche","Schulbuch","Schulhof"],0],
+["Was bedeutet 'to eat'?",["trinken","essen","laufen"],1],
+["Was bedeutet 'yellow'?",["Gelb","Orange","Lila"],0],
+["Was bedeutet 'sister'?",["Bruder","Schwester","Mutter"],1],
+["Was bedeutet 'How are you?'?",["Wie heißt du?","Wie alt bist du?","Wie geht es dir?"],2],
+["Was bedeutet 'goodbye'?",["Auf Wiedersehen","Guten Morgen","Danke"],0],
+["Was bedeutet 'three'?",["Zwei","Drei","Vier"],1]
+
+],
+
+Erdkunde: [
+
+["Wie heißt die Hauptstadt von Deutschland?",["Berlin","München","Hamburg"],0],
+["Auf welchem Kontinent liegt Deutschland?",["Asien","Europa","Afrika"],1],
+["Wie viele Kontinente gibt es üblicherweise?",["5","6","7"],2],
+["Welcher Ozean ist der größte?",["Atlantik","Pazifik","Indischer Ozean"],1],
+["Wie heißt der längste Fluss Deutschlands?",["Rhein","Donau","Main"],0],
+["Welches Land grenzt an Deutschland?",["Spanien","Polen","Portugal"],1],
+["Wie heißt die Hauptstadt von Frankreich?",["Rom","Madrid","Paris"],2],
+["Welcher Berg ist der höchste in Deutschland?",["Zugspitze","Brocken","Feldberg"],0],
+["Auf welchem Kontinent liegt Ägypten?",["Afrika","Europa","Australien"],0],
+["Wie heißt die Hauptstadt von Italien?",["Athen","Rom","Lissabon"],1],
+["Welches Meer liegt nördlich von Deutschland?",["Mittelmeer","Schwarzes Meer","Nordsee"],2],
+["Wie nennt man eine große trockene Sandlandschaft?",["Wüste","Regenwald","Steppe"],0],
+["Welcher Kontinent ist der größte?",["Europa","Asien","Australien"],1],
+["Wie heißt die Hauptstadt von Spanien?",["Barcelona","Sevilla","Madrid"],2],
+["Was zeigt ein Kompass an?",["Himmelsrichtungen","Temperatur","Uhrzeit"],0],
+["Wie heißt der Fluss, der durch Köln fließt?",["Elbe","Rhein","Spree"],1],
+["Welches Land hat die Form eines Stiefels?",["Italien","Norwegen","Schweden"],0],
+["Was ist eine Insel?",["Land, das vollständig von Wasser umgeben ist","Ein Berg","Ein Fluss"],0],
+["Wie heißt die Hauptstadt von Österreich?",["Graz","Wien","Salzburg"],1],
+["Welcher Kontinent ist besonders kalt?",["Afrika","Südamerika","Antarktis"],2],
+["Was ist ein Vulkan?",["Ein Berg, aus dem Lava austreten kann","Ein See","Ein Wald"],0],
+["Wie heißt die Hauptstadt von Großbritannien?",["Dublin","London","Edinburgh"],1],
+["Welches Gebirge liegt in Süddeutschland?",["Alpen","Harz","Eifel"],0],
+["Was ist ein Fluss?",["Fließendes Gewässer","Ein Berg","Eine Wüste"],0],
+["Wie nennt man eine Karte der ganzen Welt?",["Stadtplan","Weltkarte","Wanderkarte"],1],
+["Welches Land liegt südlich von Deutschland?",["Dänemark","Polen","Österreich"],2],
+["Was ist das Mittelmeer?",["Ein Meer","Ein Fluss","Ein See"],0],
+["Wie heißt die Hauptstadt der Schweiz?",["Zürich","Bern","Genf"],1],
+["Welcher Kontinent liegt südlich von Europa?",["Afrika","Nordamerika","Asien"],0],
+["Was bedeutet Wetter?",["Der Zustand der Atmosphäre an einem Ort","Die Form eines Berges","Die Größe eines Landes"],0]
+
+],
+
+NAWI: [
+
+["Welches Organ pumpt Blut durch den Körper?",["Lunge","Herz","Magen"],1],
+["Womit atmen Fische?",["Kiemen","Lungen","Haut"],0],
+["Was brauchen Pflanzen zum Wachsen?",["Licht und Wasser","Nur Sand","Nur Dunkelheit"],0],
+["Welches Tier ist ein Säugetier?",["Frosch","Forelle","Hund"],2],
+["Wie nennt man die kleinste Einheit eines Lebewesens?",["Zelle","Organ","Knochen"],0],
+["Welches Organ brauchen wir zum Sehen?",["Ohr","Auge","Nase"],1],
+["Was transportiert das Blut?",["Sauerstoff und Nährstoffe","Nur Wasser","Nur Luft"],0],
+["Welches Tier legt Eier?",["Katze","Huhn","Hund"],1],
+["Wie nennt man Tiere, die Pflanzen fressen?",["Fleischfresser","Pflanzenfresser","Allesfresser"],1],
+["Welches Organ hilft beim Atmen?",["Lunge","Leber","Magen"],0],
+["Was ist Photosynthese?",["Pflanzen stellen mit Licht Nährstoffe her","Tiere schlafen","Wasser verdunstet"],0],
+["Welcher Teil einer Pflanze nimmt Wasser auf?",["Blüte","Blatt","Wurzel"],2],
+["Was schützt das Gehirn?",["Schädel","Rippen","Wirbelsäule"],0],
+["Wie viele Beine hat eine Spinne?",["6","8","10"],1],
+["Welches Tier ist ein Insekt?",["Spinne","Regenwurm","Biene"],2],
+["Was brauchen Menschen zum Überleben?",["Wasser und Nahrung","Nur Süßigkeiten","Nur Licht"],0],
+["Welches Organ verdaut Nahrung?",["Magen","Herz","Lunge"],0],
+["Wie nennt man ein Tier, das sowohl Pflanzen als auch Fleisch frisst?",["Pflanzenfresser","Allesfresser","Fleischfresser"],1],
+["Was ist ein Wirbeltier?",["Ein Tier mit Wirbelsäule","Ein Tier ohne Beine","Ein Tier ohne Kopf"],0],
+["Welches Tier ist ein Amphibium?",["Frosch","Adler","Pferd"],0],
+["Was hält unseren Körper aufrecht?",["Skelett","Magen","Haut"],0],
+["Welcher Sinn gehört zur Nase?",["Hören","Riechen","Sehen"],1],
+["Was ist ein Lebensraum?",["Der Ort, an dem ein Lebewesen lebt","Ein Organ","Eine Nahrung"],0],
+["Welches Tier hält Winterschlaf?",["Igel","Huhn","Pferd"],0],
+["Was entsteht aus einer Raupe?",["Schmetterling","Fisch","Frosch"],0],
+["Welche Aufgabe hat die Haut?",["Sie schützt den Körper","Sie pumpt Blut","Sie verdaut Nahrung"],0],
+["Welches Tier ist ein Fleischfresser?",["Kuh","Löwe","Kaninchen"],1],
+["Was brauchen Pflanzen für die Photosynthese?",["Licht, Wasser und Kohlenstoffdioxid","Nur Erde","Nur Sauerstoff"],0],
+["Wie viele Sinne hat der Mensch klassisch?",["3","5","7"],1],
+["Welches Organ verarbeitet Informationen und steuert den Körper?",["Gehirn","Magen","Herz"],0]
+
+]
+
+};
+
+
+let currentSubject = "";
+let questions = [];
+let currentQuestion = 0;
+let score = 0;
+let lives = 3;
+let timeLeft = 15;
+let clock = null;
+let answered = false;
+let lastScore = 0;
+
+
+function startGame(subject) {
+
+    clearInterval(clock);
+
+    currentSubject = subject;
+    questions = [...quizzes[subject]];
+
+    questions.sort(() => Math.random() - 0.5);
+
+    currentQuestion = 0;
+    score = 0;
+    lives = 3;
+
+    document.getElementById("home").style.display = "none";
+    document.getElementById("end").style.display = "none";
+    document.getElementById("game").style.display = "block";
+
+    document.getElementById("gameTitle").textContent =
+        "🎮 " + subject + " – Quiz";
+
+    updateStats();
+    showQuestion();
+}
+
+
+function updateStats() {
+
+    document.getElementById("score").textContent = score;
+    document.getElementById("lives").textContent = lives;
+    document.getElementById("number").textContent =
+        Math.min(currentQuestion + 1, 30);
+
+    document.getElementById("progress").textContent =
+        "Frage " + Math.min(currentQuestion + 1, 30) + " von 30";
+}
+
+
+function showQuestion() {
+
+    clearInterval(clock);
+
+    if (currentQuestion >= questions.length || lives <= 0) {
+        finishGame();
+        return;
+    }
+
+    answered = false;
+    timeLeft = 15;
+
+    updateStats();
+
+    const q = questions[currentQuestion];
+
+    document.getElementById("question").textContent = q[0];
+
+    const answers = document.getElementById("answers");
+    answers.innerHTML = "";
+
+    document.getElementById("feedback").textContent = "";
+
+    document.getElementById("nextBtn").disabled = true;
+
+    q[1].forEach((answer, index) => {
+
+        const button = document.createElement("button");
+
+        button.className = "answer";
+        button.textContent = answer;
+
+        button.onclick = () => checkAnswer(index, button);
+
+        answers.appendChild(button);
+
+    });
+
+    updateTimerDisplay();
+    startTimer();
+}
+
+
+function startTimer() {
+
+    clearInterval(clock);
+
+    clock = setInterval(() => {
+
+        timeLeft--;
+
+        updateTimerDisplay();
+
+        if (timeLeft <= 0) {
+
+            clearInterval(clock);
+
+            if (!answered) {
+
+                answered = true;
+                lives--;
+
+                document.getElementById("feedback").textContent =
+                    "⏰ Zeit abgelaufen! Die richtige Antwort war: " +
+                    questions[currentQuestion][1][questions[currentQuestion][2]];
+
+                markCorrectAnswer();
+                disableAnswers();
+
+                updateStats();
+
+                document.getElementById("nextBtn").disabled = false;
+
+            }
+
+        }
+
+    }, 1000);
+
+}
+
+
+function updateTimerDisplay() {
+
+    document.getElementById("timer").textContent = timeLeft;
+
+    const percentage = (timeLeft / 15) * 100;
+
+    document.getElementById("bar").style.width = percentage + "%";
+
+    if (timeLeft <= 5) {
+        document.getElementById("timer").style.color = "#ff5368";
+        document.getElementById("bar").style.background = "#ff5368";
+    } else {
+        document.getElementById("timer").style.color = "#55e6ff";
+        document.getElementById("bar").style.background =
+            "linear-gradient(90deg,#00e676,#55e6ff)";
+    }
+
+}
+
+
+function checkAnswer(index, button) {
+
+    if (answered) return;
+
+    answered = true;
+    clearInterval(clock);
+
+    const correct = questions[currentQuestion][2];
+
+    if (index === correct) {
+
+        score += 100;
+
+        button.classList.add("correct");
+
+        document.getElementById("feedback").textContent =
+            "✅ Richtig! +100 Punkte";
+
+    } else {
+
+        lives--;
+
+        button.classList.add("wrong");
+
+        document.getElementById("feedback").textContent =
+            "❌ Leider falsch! Die richtige Antwort ist: " +
+            questions[currentQuestion][1][correct];
+
+        markCorrectAnswer();
+
+    }
+
+    disableAnswers();
+    updateStats();
+
+    document.getElementById("nextBtn").disabled = false;
+
+}
+
+
+function markCorrectAnswer() {
+
+    const correct = questions[currentQuestion][2];
+
+    const buttons = document.querySelectorAll(".answer");
+
+    if (buttons[correct]) {
+        buttons[correct].classList.add("correct");
+    }
+
+}
+
+
+function disableAnswers() {
+
+    document.querySelectorAll(".answer").forEach(button => {
+        button.disabled = true;
+    });
+
+}
+
+
+function nextQuestion() {
+
+    if (!answered) return;
+
+    clearInterval(clock);
+
+    currentQuestion++;
+
+    if (currentQuestion >= questions.length || lives <= 0) {
+        finishGame();
+        return;
+    }
+
+    showQuestion();
+
+}
+
+
+function finishGame() {
+
+    clearInterval(clock);
+
+    lastScore = score;
+
+    document.getElementById("game").style.display = "none";
+    document.getElementById("end").style.display = "block";
+
+    document.getElementById("endScore").textContent =
+        score + " Punkte";
+
+    let message = "";
+
+    if (score >= 2500) {
+        message = "🏆 Unglaublich! Du bist ein echter Lern-Champion!";
+    } else if (score >= 1800) {
+        message = "🌟 Sehr gut! Du hast richtig viel gewusst!";
+    } else if (score >= 1000) {
+        message = "👍 Gut gemacht! Weiter so!";
+    } else {
+        message = "💪 Übung macht den Meister! Versuch es nochmal!";
+    }
+
+    document.getElementById("endMessage").textContent = message;
+
+    document.getElementById("endDetails").textContent =
+        "Fach: " + currentSubject +
+        " | Richtige Antworten: " + (score / 100) +
+        " von 30 | Verlorene Leben: " + (3 - lives);
+
+}
+
+
+function backHome() {
+
+    clearInterval(clock);
+
+    document.getElementById("end").style.display = "none";
+    document.getElementById("game").style.display = "none";
+    document.getElementById("home").style.display = "block";
+
+}
+
+
+function restartGame() {
+
+    startGame(currentSubject);
+
+}
+
+</script>
+
+</body>
+</html>
