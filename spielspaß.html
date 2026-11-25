@@ -5,254 +5,63 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Spiel und habe Spaß</title>
-
 <style>
-* {box-sizing:border-box}
-
-body {
- margin:0;
- min-height:100vh;
- background:radial-gradient(circle at top,#455a64,#101820 75%);
- color:white;
- font-family:Arial,sans-serif;
- text-align:center;
- padding:15px;
-}
-
-h1 {
- font-size:clamp(25px,5vw,38px);
- text-shadow:0 4px 8px #000;
-}
-
-button {
- cursor:pointer;
- border:0;
- border-radius:12px;
- padding:13px 22px;
- font-size:17px;
- font-weight:bold;
- background:linear-gradient(#ffdf65,#e5a900);
- color:#222;
- box-shadow:0 5px 0 #966d00,0 8px 15px #0006;
-}
-
-button:active {
- transform:translateY(4px);
- box-shadow:0 1px 0 #966d00;
-}
-
-button:disabled {
- opacity:.4;
- cursor:not-allowed;
-}
-
-#roll.red {
- background:linear-gradient(#ff7777,#c62828);
- color:white;
- box-shadow:0 5px 0 #7f0000,0 8px 15px #0006;
-}
-
-#roll.blue {
- background:linear-gradient(#64b5f6,#1565c0);
- color:white;
- box-shadow:0 5px 0 #003c8f,0 8px 15px #0006;
-}
-
-#roll.green {
- background:linear-gradient(#81c784,#2e7d32);
- color:white;
- box-shadow:0 5px 0 #1b5e20,0 8px 15px #0006;
-}
-
-#roll.yellow {
- background:linear-gradient(#fff176,#f9a825);
- color:#222;
- box-shadow:0 5px 0 #b28704,0 8px 15px #0006;
-}
-
-#menu {
- position:fixed;
- inset:0;
- z-index:10;
- display:flex;
- justify-content:center;
- align-items:center;
- background:linear-gradient(135deg,#17252e,#354e5a);
-}
-
-.menuBox {
- background:linear-gradient(145deg,#546e7a,#263238);
- padding:35px;
- width:min(90%,420px);
- border-radius:25px;
- box-shadow:0 20px 50px #0009;
- border:2px solid #ffffff33;
-}
-
-.menuBox h1 {margin-top:0}
-
-.colorChoices {
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:12px;
- margin:20px 0;
-}
-
-.colorChoices label {
- background:#ffffff18;
- padding:14px 8px;
- border-radius:10px;
- cursor:pointer;
- font-size:17px;
- border:1px solid #ffffff33;
-}
-
-.colorChoices input {
- transform:scale(1.3);
- margin-right:7px;
-}
-
-#selectionInfo {color:#ffdf65}
-#selectionError {color:#ff7777}
-
-#game {display:none}
-
-#gameLayout {
- display:flex;
- flex-wrap:wrap;
- justify-content:center;
- align-items:center;
- gap:30px;
-}
-
-.board3d {
- perspective:1100px;
- padding:20px;
-}
-
-#board {
- width:min(90vw,620px);
- height:auto;
- border-radius:12px;
- border:7px solid #382a1c;
- background:#f4e9c8;
- transform:rotateX(9deg);
- transform-style:preserve-3d;
- box-shadow:0 22px 0 #392a20,0 30px 35px #000b;
- touch-action:none;
-}
-
-.panel {
- width:270px;
- padding:22px;
- border-radius:20px;
- background:linear-gradient(145deg,#455a64,#263238);
- box-shadow:0 12px 30px #0008;
-}
-
-#turn {
- font-size:25px;
- margin:5px;
-}
-
-#diceArea {
- height:155px;
- display:flex;
- justify-content:center;
- align-items:center;
- perspective:600px;
-}
-
-.dice {
- width:76px;
- height:76px;
- position:relative;
- transform-style:preserve-3d;
- transition:transform .65s cubic-bezier(.2,.8,.3,1);
-}
-
-.face {
- position:absolute;
- width:76px;
- height:76px;
- background:linear-gradient(145deg,#fff,#d9d9d9);
- border:2px solid #999;
- border-radius:12px;
- color:#222;
- font-size:48px;
- line-height:76px;
- box-shadow:inset 0 0 12px #aaa;
-}
-
-.front {transform:translateZ(38px)}
-.back {transform:rotateY(180deg) translateZ(38px)}
-.right {transform:rotateY(90deg) translateZ(38px)}
-.left {transform:rotateY(-90deg) translateZ(38px)}
-.top {transform:rotateX(90deg) translateZ(38px)}
-.bottom {transform:rotateX(-90deg) translateZ(38px)}
-
-.dice.rolling {
- animation:rollDice 1.15s ease-in-out;
-}
-
-@keyframes rollDice {
- 0% {transform:rotateX(0) rotateY(0) rotateZ(0)}
- 25% {transform:rotateX(250deg) rotateY(180deg) rotateZ(90deg)}
- 50% {transform:rotateX(500deg) rotateY(390deg) rotateZ(180deg)}
- 75% {transform:rotateX(720deg) rotateY(650deg) rotateZ(270deg)}
- 100% {transform:rotateX(1080deg) rotateY(900deg) rotateZ(360deg)}
-}
-
-#message {
- min-height:65px;
- line-height:1.5;
- font-size:16px;
-}
-
-.score {
- text-align:left;
- line-height:2.1;
-}
-
-.dot {
- display:inline-block;
- width:15px;
- height:15px;
- border-radius:50%;
- margin-right:10px;
-}
-
-#newGame {
- margin-top:18px;
- background:linear-gradient(#9ed9ff,#4b9dcc);
-}
-
-@media(max-width:700px) {
- .panel {width:min(95%,400px)}
- .board3d {padding:5px}
-}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at top,#455a64,#101820 75%);color:white;font-family:Arial,sans-serif;text-align:center;padding:15px}
+h1{font-size:clamp(25px,5vw,38px);text-shadow:0 4px 8px #000}
+button{cursor:pointer;border:0;border-radius:12px;padding:13px 22px;font-size:17px;font-weight:bold;background:linear-gradient(#ffdf65,#e5a900);color:#222;box-shadow:0 5px 0 #966d00,0 8px 15px #0006}
+button:active{transform:translateY(4px);box-shadow:0 1px 0 #966d00}
+button:disabled{opacity:.4;cursor:not-allowed}
+#roll.red{background:linear-gradient(#ff7777,#c62828);color:white}
+#roll.blue{background:linear-gradient(#64b5f6,#1565c0);color:white}
+#roll.green{background:linear-gradient(#81c784,#2e7d32);color:white}
+#roll.yellow{background:linear-gradient(#fff176,#f9a825);color:#222}
+#menu{position:fixed;inset:0;z-index:10;display:flex;justify-content:center;align-items:center;background:linear-gradient(135deg,#17252e,#354e5a)}
+.menuBox{background:linear-gradient(145deg,#546e7a,#263238);padding:35px;width:min(90%,420px);border-radius:25px;box-shadow:0 20px 50px #0009;border:2px solid #ffffff33}
+.colorChoices{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.colorChoices label{background:#ffffff18;padding:14px 8px;border-radius:10px;cursor:pointer;font-size:17px;border:1px solid #ffffff33}
+.colorChoices input{transform:scale(1.3);margin-right:7px}
+#selectionInfo{color:#ffdf65}
+#selectionError{color:#ff7777}
+#game{display:none}
+#gameLayout{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:30px}
+.board3d{perspective:1100px;padding:20px}
+#board{width:min(90vw,620px);height:auto;border-radius:12px;border:7px solid #382a1c;background:#f4e9c8;transform:rotateX(9deg);transform-style:preserve-3d;box-shadow:0 22px 0 #392a20,0 30px 35px #000b;touch-action:none}
+.panel{width:270px;padding:22px;border-radius:20px;background:linear-gradient(145deg,#455a64,#263238);box-shadow:0 12px 30px #0008}
+#turn{font-size:25px;margin:5px}
+#diceArea{height:155px;display:flex;justify-content:center;align-items:center;perspective:600px}
+.dice{width:76px;height:76px;position:relative;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.2,.8,.3,1)}
+.face{position:absolute;width:76px;height:76px;background:linear-gradient(145deg,#fff,#d9d9d9);border:2px solid #999;border-radius:12px;color:#222;font-size:48px;line-height:76px;box-shadow:inset 0 0 12px #aaa}
+.front{transform:translateZ(38px)}
+.back{transform:rotateY(180deg) translateZ(38px)}
+.right{transform:rotateY(90deg) translateZ(38px)}
+.left{transform:rotateY(-90deg) translateZ(38px)}
+.top{transform:rotateX(90deg) translateZ(38px)}
+.bottom{transform:rotateX(-90deg) translateZ(38px)}
+.dice.rolling{animation:rollDice 1.15s ease-in-out}
+@keyframes rollDice{0%{transform:rotateX(0) rotateY(0) rotateZ(0)}25%{transform:rotateX(250deg) rotateY(180deg) rotateZ(90deg)}50%{transform:rotateX(500deg) rotateY(390deg) rotateZ(180deg)}75%{transform:rotateX(720deg) rotateY(650deg) rotateZ(270deg)}100%{transform:rotateX(1080deg) rotateY(900deg) rotateZ(360deg)}}
+#message{min-height:65px;line-height:1.5;font-size:16px}
+.score{text-align:left;line-height:2.1}
+.dot{display:inline-block;width:15px;height:15px;border-radius:50%;margin-right:10px}
+#newGame{margin-top:18px;background:linear-gradient(#9ed9ff,#4b9dcc)}
+@media(max-width:700px){.panel{width:min(95%,400px)}.board3d{padding:5px}}
 </style>
 </head>
-
 <body>
 
 <div id="menu">
  <div class="menuBox">
   <h1>🎲 Spiel und habe Spaß</h1>
   <p>Willkommen zum 3D-Brettspiel!</p>
-
   <h3>Welche Farben sollen mitspielen?</h3>
-
   <div class="colorChoices">
    <label><input type="checkbox" class="colorSelect" value="0" checked> 🔴 Rot</label>
    <label><input type="checkbox" class="colorSelect" value="1" checked> 🔵 Blau</label>
    <label><input type="checkbox" class="colorSelect" value="2"> 🟢 Grün</label>
    <label><input type="checkbox" class="colorSelect" value="3"> 🟡 Gelb</label>
   </div>
-
   <p id="selectionInfo">2 Farben ausgewählt</p>
   <p id="selectionError"></p>
-
   <button onclick="startGame()">SPIEL STARTEN</button>
  </div>
 </div>
@@ -261,14 +70,11 @@ button:disabled {
 
 <div id="game">
  <div id="gameLayout">
-
   <div class="board3d">
    <canvas id="board" width="660" height="660"></canvas>
   </div>
-
   <div class="panel">
    <h2 id="turn">Rot ist dran</h2>
-
    <div id="diceArea">
     <div class="dice" id="dice">
      <div class="face front">⚀</div>
@@ -279,17 +85,12 @@ button:disabled {
      <div class="face bottom">⚄</div>
     </div>
    </div>
-
    <button id="roll" onclick="rollDice()">🎲 WÜRFELN</button>
-
    <p id="message">Viel Glück!</p>
-
    <h3>Spielstand – Figuren im Ziel</h3>
    <div class="score" id="score"></div>
-
    <button id="newGame" onclick="backToMenu()">Neues Spiel</button>
   </div>
-
  </div>
 </div>
 
@@ -301,18 +102,12 @@ const names=["Rot","Blau","Grün","Gelb"];
 const colors=["#e53935","#1976d2","#43a047","#fdd835"];
 
 const track=[
- [4,0],[5,0],[6,0],
- [6,1],[6,2],[6,3],[6,4],
- [7,4],[8,4],[9,4],[10,4],
- [10,5],[10,6],
- [9,6],[8,6],[7,6],[6,6],
- [6,7],[6,8],[6,9],[6,10],
- [5,10],[4,10],
- [4,9],[4,8],[4,7],[4,6],
- [3,6],[2,6],[1,6],[0,6],
- [0,5],[0,4],
- [1,4],[2,4],[3,4],[4,4],
- [4,3],[4,2],[4,1]
+ [4,0],[5,0],[6,0],[6,1],[6,2],[6,3],[6,4],
+ [7,4],[8,4],[9,4],[10,4],[10,5],[10,6],
+ [9,6],[8,6],[7,6],[6,6],[6,7],[6,8],[6,9],[6,10],
+ [5,10],[4,10],[4,9],[4,8],[4,7],[4,6],
+ [3,6],[2,6],[1,6],[0,6],[0,5],[0,4],
+ [1,4],[2,4],[3,4],[4,4],[4,3],[4,2],[4,1]
 ];
 
 const starts=[0,10,20,30];
@@ -343,84 +138,51 @@ let rollAttempts=0;
 
 function updateSelection(){
  const count=document.querySelectorAll(".colorSelect:checked").length;
- document.getElementById("selectionInfo").textContent=
-   count+" Farben ausgewählt";
+ document.getElementById("selectionInfo").textContent=count+" Farben ausgewählt";
 }
-
-document.querySelectorAll(".colorSelect").forEach(input=>{
- input.addEventListener("change",updateSelection);
-});
+document.querySelectorAll(".colorSelect").forEach(input=>input.addEventListener("change",updateSelection));
 
 function updateRollColor(){
  const button=document.getElementById("roll");
  button.classList.remove("red","blue","green","yellow");
-
- const colorClasses=["red","blue","green","yellow"];
- button.classList.add(colorClasses[current]);
+ button.classList.add(["red","blue","green","yellow"][current]);
 }
 
 function startGame(){
- active=Array.from(
-   document.querySelectorAll(".colorSelect:checked")
- ).map(input=>Number(input.value));
-
+ active=Array.from(document.querySelectorAll(".colorSelect:checked")).map(input=>Number(input.value));
  if(active.length<2||active.length>4){
-   document.getElementById("selectionError").textContent=
-     "Bitte wähle mindestens 2 Farben aus!";
-   return;
+  document.getElementById("selectionError").textContent="Bitte wähle mindestens 2 Farben aus!";
+  return;
  }
-
  document.getElementById("selectionError").textContent="";
-
  pieces=Array.from({length:4},()=>[-2,-2,-2,-2]);
-
- active.forEach(p=>{
-   pieces[p]=[-1,-1,-1,-1];
- });
-
- current=active[0];
- value=0;
- rolled=false;
- gameOver=false;
- moves=[];
- rollAttempts=0;
-
+ active.forEach(p=>pieces[p]=[-1,-1,-1,-1]);
+ current=active[0];value=0;rolled=false;gameOver=false;moves=[];rollAttempts=0;
  document.getElementById("menu").style.display="none";
  document.getElementById("game").style.display="block";
-
- document.getElementById("dice").style.transform=
-   "rotateX(0deg) rotateY(0deg)";
-
+ document.getElementById("dice").style.transform="rotateX(0deg) rotateY(0deg)";
  document.getElementById("dice").classList.remove("rolling");
-
  message(names[current]+" beginnt! Du darfst bis zu 3-mal würfeln, um eine 6 zu bekommen.");
- update();
- draw();
+ update();draw();
 }
 
 function backToMenu(){
  if(rollTimer)clearTimeout(rollTimer);
- rollTimer=null;
-
- rolled=false;
- moves=[];
+ rollTimer=null;rolled=false;moves=[];
  document.getElementById("game").style.display="none";
  document.getElementById("menu").style.display="flex";
 }
 
-/* Prüft, ob eine Figur bereits im Spiel ist */
 function hasPieceOnBoard(p){
- return pieces[p].some(v=>v>=0&&v<43);
+ return pieces[p].some(v=>v>=0&&v<40);
 }
 
-/* Prüft, ob alle Figuren noch im eigenen Haus stehen */
+/* Drei Würfe, solange keine eigene Figur auf dem weißen Laufweg steht */
 function allPiecesAtHome(p){
- return pieces[p].every(v=>v===-1);
+ return !hasPieceOnBoard(p);
 }
 
-function message(t){
- document.getElementById("message").textContent=t;
-}
+function message(t){document.getElementById("message").textContent=t}
 
 function position(p,pos,i){
  if(pos===-1)return homes[p][i];
@@ -432,45 +194,26 @@ function ownOccupied(p,index,dest){
  return pieces[p].some((v,i)=>i!==index&&v===dest);
 }
 
-function hasHome(p){
- return pieces[p].some(v=>v===-1);
-}
+function hasHome(p){return pieces[p].some(v=>v===-1)}
 
 function canMove(p,i,n){
  const pos=pieces[p][i];
-
  if(pos===-2||pos===43)return false;
-
- if(pos===-1){
-   return n===6&&!ownOccupied(p,i,0);
- }
-
+ if(pos===-1)return n===6&&!ownOccupied(p,i,0);
  const target=pos+n;
-
- if(target>43)return false;
- if(ownOccupied(p,i,target))return false;
-
+ if(target>43||ownOccupied(p,i,target))return false;
  return true;
 }
 
 function legalMoves(){
  const p=current;
-
  if(value===6&&hasHome(p)){
-   const startFigure=pieces[p].indexOf(0);
-
-   if(startFigure!==-1){
-     return canMove(p,startFigure,6)?[startFigure]:[];
-   }
-
-   const homeFigure=pieces[p].indexOf(-1);
-
-   if(homeFigure!==-1)return [homeFigure];
+  const startFigure=pieces[p].indexOf(0);
+  if(startFigure!==-1)return canMove(p,startFigure,6)?[startFigure]:[];
+  const homeFigure=pieces[p].indexOf(-1);
+  if(homeFigure!==-1)return [homeFigure];
  }
-
- return pieces[p]
-  .map((v,i)=>canMove(p,i,value)?i:-1)
-  .filter(i=>i!==-1);
+ return pieces[p].map((v,i)=>canMove(p,i,value)?i:-1).filter(i=>i!==-1);
 }
 
 const dicePositions={
@@ -486,84 +229,61 @@ function rollDice(){
  if(rolled||gameOver)return;
 
  const dice=document.getElementById("dice");
- const button=document.getElementById("roll");
-
  const waitingForSix=allPiecesAtHome(current);
 
- if(!waitingForSix){
-   rollAttempts=0;
- }
+ if(!waitingForSix)rollAttempts=0;
 
  rolled=true;
- button.disabled=true;
-
+ document.getElementById("roll").disabled=true;
  dice.classList.remove("rolling");
  void dice.offsetWidth;
  dice.classList.add("rolling");
-
  message("🎲 Der Würfel rollt...");
 
  const result=Math.floor(Math.random()*6)+1;
 
  rollTimer=setTimeout(()=>{
-   rollTimer=null;
+  rollTimer=null;
+  if(!rolled||gameOver)return;
 
-   if(!rolled||gameOver)return;
+  dice.classList.remove("rolling");
+  dice.style.transform=dicePositions[result];
+  value=result;
 
-   dice.classList.remove("rolling");
-   dice.style.transform=dicePositions[result];
+  if(waitingForSix)rollAttempts++;
 
-   value=result;
-
-   if(waitingForSix){
-     rollAttempts++;
-   }
-
-   if(waitingForSix&&result!==6){
-     if(rollAttempts<3){
-       rolled=false;
-       moves=[];
-
-       message(
-         "Du hast eine "+result+" gewürfelt. Noch "+
-         (3-rollAttempts)+" Würfelversuch(e), um eine 6 zu bekommen!"
-       );
-
-       update();
-       draw();
-       return;
-     }else{
-       message("Keine 6 nach drei Versuchen. Der nächste Spieler ist dran.");
-       update();
-
-       rollTimer=setTimeout(()=>{
-         rollTimer=null;
-         if(!gameOver)endTurn(false);
-       },1400);
-
-       return;
-     }
-   }
-
-   if(result===6){
-     rollAttempts=0;
-   }
-
-   moves=legalMoves();
-
-   if(moves.length===0){
-     message("Kein gültiger Zug möglich.");
-     update();
-
-     rollTimer=setTimeout(()=>{
-       rollTimer=null;
-       if(!gameOver)endTurn(result===6);
-     },1200);
+  if(waitingForSix&&result!==6){
+   if(rollAttempts<3){
+    rolled=false;moves=[];
+    message("Du hast eine "+result+" gewürfelt. Noch "+(3-rollAttempts)+" Würfelversuch(e), um eine 6 zu bekommen!");
+    update();draw();
+    return;
    }else{
-     message("Du hast eine "+value+" gewürfelt! Wähle eine Figur.");
-     update();
-     draw();
+    message("Keine 6 nach drei Versuchen. Der nächste Spieler ist dran.");
+    update();
+    rollTimer=setTimeout(()=>{
+     rollTimer=null;
+     if(!gameOver)endTurn(false);
+    },1400);
+    return;
    }
+  }
+
+  if(result===6)rollAttempts=0;
+
+  moves=legalMoves();
+
+  if(moves.length===0){
+   message("Kein gültiger Zug möglich.");
+   update();
+   rollTimer=setTimeout(()=>{
+    rollTimer=null;
+    if(!gameOver)endTurn(result===6);
+   },1200);
+  }else{
+   message("Du hast eine "+value+" gewürfelt! Wähle eine Figur.");
+   update();draw();
+  }
  },1150);
 }
 
@@ -571,241 +291,168 @@ function move(i){
  if(!rolled||!moves.includes(i)||gameOver)return;
 
  let pos=pieces[current][i];
-
  if(pos===-1){
-   pieces[current][i]=0;
-   kick(current,0);
+  pieces[current][i]=0;
+  kick(current,0);
  }else{
-   pieces[current][i]+=value;
-
-   if(pieces[current][i]<40){
-     kick(current,pieces[current][i]);
-   }
+  pieces[current][i]+=value;
+  if(pieces[current][i]<40)kick(current,pieces[current][i]);
  }
 
  const six=value===6;
 
  if(pieces[current].every(v=>v===43)){
-   gameOver=true;
-   rolled=false;
-   moves=[];
-
-   message("🏆 "+names[current]+" hat alle 4 Figuren im Ziel und gewinnt!");
-   update();
-   draw();
-   return;
+  gameOver=true;rolled=false;moves=[];
+  message("🏆 "+names[current]+" hat alle 4 Figuren im Ziel und gewinnt!");
+  update();draw();return;
  }
-
  endTurn(six);
 }
 
 function kick(p,pos){
  const field=(starts[p]+pos)%40;
-
  for(let q of active){
-   if(q===p)continue;
-
-   pieces[q].forEach((v,i)=>{
-     if(v>=0&&v<40&&(starts[q]+v)%40===field){
-       pieces[q][i]=-1;
-       message(names[p]+" hat "+names[q]+" geschlagen! 💥");
-     }
-   });
+  if(q===p)continue;
+  pieces[q].forEach((v,i)=>{
+   if(v>=0&&v<40&&(starts[q]+v)%40===field)pieces[q][i]=-1;
+  });
  }
 }
 
 function endTurn(six){
- rolled=false;
- moves=[];
- value=0;
-
+ rolled=false;moves=[];value=0;
  if(!six){
-   const index=active.indexOf(current);
-   current=active[(index+1)%active.length];
-   rollAttempts=0;
-
-   message(names[current]+" ist dran. Würfle!");
+  const index=active.indexOf(current);
+  current=active[(index+1)%active.length];
+  rollAttempts=0;
+  message(names[current]+" ist dran. Würfle!");
  }else{
-   message(names[current]+" hat eine 6! Noch einmal würfeln.");
+  message(names[current]+" hat eine 6! Noch einmal würfeln.");
  }
-
- update();
- draw();
-}
-
-function update(){
- document.getElementById("turn").textContent=
-   gameOver?"Spiel beendet":names[current]+" ist dran";
-
- updateRollColor();
-
- document.getElementById("roll").disabled=rolled||gameOver;
-
- let html="";
-
- active.forEach(p=>{
-   const done=pieces[p].filter(v=>v===43).length;
-
-   html+=`
-   <div>
-    <span class="dot" style="background:${colors[p]}"></span>
-    ${names[p]}: ${done}/4 im Ziel
-   </div>`;
- });
-
- document.getElementById("score").innerHTML=html;
+ update();draw();
 }
 
 function square(x,y,color,label){
  const off=55,size=50;
  const px=off+x*size,py=off+y*size;
-
- ctx.fillStyle=color;
- ctx.fillRect(px,py,size,size);
-
- ctx.strokeStyle="#333";
- ctx.lineWidth=1.5;
- ctx.strokeRect(px,py,size,size);
-
+ ctx.fillStyle=color;ctx.fillRect(px,py,size,size);
+ ctx.strokeStyle="#333";ctx.lineWidth=1.5;ctx.strokeRect(px,py,size,size);
  if(label){
-   ctx.fillStyle="#222";
-   ctx.font="bold 13px Arial";
-   ctx.textAlign="center";
-   ctx.fillText(label,px+25,py+30);
+  ctx.fillStyle="#222";ctx.font="bold 13px Arial";ctx.textAlign="center";
+  ctx.fillText(label,px+25,py+30);
  }
 }
 
 function draw(){
  ctx.clearRect(0,0,660,660);
+ ctx.fillStyle="#f4e9c8";ctx.fillRect(0,0,660,660);
 
- ctx.fillStyle="#f4e9c8";
- ctx.fillRect(0,0,660,660);
-
+ /* Die vier farbigen Häuser */
  const rects=[[0,0],[7,0],[7,7],[0,7]];
-
  rects.forEach(([x,y],p)=>{
-   ctx.fillStyle=colors[p];
-   ctx.fillRect(55+x*50,55+y*50,200,200);
-
-   ctx.fillStyle="#fff4df";
-   ctx.fillRect(55+(x+.5)*50,55+(y+.5)*50,150,150);
-
-   ctx.strokeStyle="#333";
-   ctx.lineWidth=2;
-   ctx.strokeRect(55+(x+.5)*50,55+(y+.5)*50,150,150);
+  ctx.fillStyle=colors[p];
+  ctx.fillRect(55+x*50,55+y*50,200,200);
+  ctx.fillStyle="#fff4df";
+  ctx.fillRect(55+(x+.5)*50,55+(y+.5)*50,150,150);
+  ctx.strokeStyle="#333";ctx.lineWidth=2;
+  ctx.strokeRect(55+(x+.5)*50,55+(y+.5)*50,150,150);
  });
 
+ /* Weißer Laufweg */
  track.forEach((pt,i)=>{
-   let c="#fff";
-
-   for(let p=0;p<4;p++){
-     if(i===starts[p])c=colors[p];
-   }
-
-   square(pt[0],pt[1],c);
+  let c="#fff";
+  for(let p=0;p<4;p++)if(i===starts[p])c=colors[p];
+  square(pt[0],pt[1],c);
  });
 
  for(let p=0;p<4;p++){
-   const [x,y]=track[starts[p]];
-   ctx.fillStyle="#fff";
-   ctx.font="bold 15px Arial";
-   ctx.textAlign="center";
-   ctx.fillText("A",55+x*50+25,55+y*50+18);
+  const [x,y]=track[starts[p]];
+  ctx.fillStyle="#fff";ctx.font="bold 15px Arial";ctx.textAlign="center";
+  ctx.fillText("A",55+x*50+25,55+y*50+18);
  }
 
+ /* Farbige Zielfelder */
  goals.forEach((path,p)=>{
-   path.forEach((pt,i)=>{
-     square(pt[0],pt[1],colors[p],String.fromCharCode(97+i));
-   });
+  path.forEach((pt,i)=>square(pt[0],pt[1],colors[p],String.fromCharCode(97+i)));
  });
 
+ /* Figuren */
  active.forEach(p=>{
-   pieces[p].forEach((pos,i)=>{
-     const [x,y]=position(p,pos,i);
-     let px=55+x*50+25;
-     let py=55+y*50+25;
+  pieces[p].forEach((pos,i)=>{
+   const [x,y]=position(p,pos,i);
+   let px=55+x*50+25,py=55+y*50+25;
+   const selectable=p===current&&rolled&&moves.includes(i);
 
-     const selectable=p===current&&rolled&&moves.includes(i);
-
-     let same=0;
-
-     active.forEach(q=>{
-       pieces[q].forEach((v,j)=>{
-         if(q===p&&j===i)return;
-         const [ox,oy]=position(q,v,j);
-         if(ox===x&&oy===y)same++;
-       });
-     });
-
-     if(same){
-       const offsets=[[-8,-8],[8,-8],[-8,8],[8,8]];
-       px+=offsets[i][0];
-       py+=offsets[i][1];
-     }
-
-     ctx.beginPath();
-     ctx.arc(px+2,py+4,16,0,Math.PI*2);
-     ctx.fillStyle="#0006";
-     ctx.fill();
-
-     ctx.beginPath();
-     ctx.arc(px,py,15,0,Math.PI*2);
-     ctx.fillStyle=colors[p];
-     ctx.fill();
-
-     ctx.lineWidth=selectable?5:2;
-     ctx.strokeStyle=selectable?"#ff9800":"#222";
-     ctx.stroke();
-
-     ctx.fillStyle=p===3?"#222":"white";
-     ctx.font="bold 12px Arial";
-     ctx.textAlign="center";
-     ctx.fillText(i+1,px,py+4);
-
-     if(selectable){
-       ctx.beginPath();
-       ctx.arc(px,py,22,0,Math.PI*2);
-       ctx.strokeStyle="#ff9800";
-       ctx.lineWidth=3;
-       ctx.stroke();
-     }
+   let same=0;
+   active.forEach(q=>{
+    pieces[q].forEach((v,j)=>{
+     if(q===p&&j===i)return;
+     const [ox,oy]=position(q,v,j);
+     if(ox===x&&oy===y)same++;
+    });
    });
+
+   if(same){
+    const offsets=[[-8,-8],[8,-8],[-8,8],[8,8]];
+    px+=offsets[i][0];py+=offsets[i][1];
+   }
+
+   /* Schatten und 3D-Figur */
+   ctx.beginPath();ctx.arc(px+2,py+4,16,0,Math.PI*2);
+   ctx.fillStyle="#0006";ctx.fill();
+
+   ctx.beginPath();ctx.arc(px,py,15,0,Math.PI*2);
+   ctx.fillStyle=colors[p];ctx.fill();
+   ctx.lineWidth=selectable?5:2;
+   ctx.strokeStyle=selectable?"#ff9800":"#222";ctx.stroke();
+
+   ctx.fillStyle=p===3?"#222":"white";
+   ctx.font="bold 12px Arial";ctx.textAlign="center";
+   ctx.fillText(i+1,px,py+4);
+
+   if(selectable){
+    ctx.beginPath();ctx.arc(px,py,22,0,Math.PI*2);
+    ctx.strokeStyle="#ff9800";ctx.lineWidth=3;ctx.stroke();
+   }
+  });
  });
 }
 
-/* Funktioniert mit Maus, Finger und Stift */
 canvas.addEventListener("pointerdown",e=>{
  if(!rolled||gameOver)return;
-
  e.preventDefault();
 
  const r=canvas.getBoundingClientRect();
  const mx=(e.clientX-r.left)*660/r.width;
  const my=(e.clientY-r.top)*660/r.height;
 
- let selected=null;
- let smallestDistance=27;
+ let selected=null,smallestDistance=27;
 
  pieces[current].forEach((pos,i)=>{
-   if(!moves.includes(i))return;
-
-   const [x,y]=position(current,pos,i);
-   const px=55+x*50+25;
-   const py=55+y*50+25;
-
-   const distance=Math.hypot(mx-px,my-py);
-
-   if(distance<smallestDistance){
-     smallestDistance=distance;
-     selected=i;
-   }
+  if(!moves.includes(i))return;
+  const [x,y]=position(current,pos,i);
+  const px=55+x*50+25,py=55+y*50+25;
+  const distance=Math.hypot(mx-px,my-py);
+  if(distance<smallestDistance){
+   smallestDistance=distance;selected=i;
+  }
  });
 
- if(selected!==null){
-   move(selected);
- }
+ if(selected!==null)move(selected);
 });
-</script>
 
+function update(){
+ document.getElementById("turn").textContent=gameOver?"Spiel beendet":names[current]+" ist dran";
+ updateRollColor();
+ document.getElementById("roll").disabled=rolled||gameOver;
+
+ let html="";
+ active.forEach(p=>{
+  const done=pieces[p].filter(v=>v===43).length;
+  html+=`<div><span class="dot" style="background:${colors[p]}"></span>${names[p]}: ${done}/4 im Ziel</div>`;
+ });
+ document.getElementById("score").innerHTML=html;
+}
+</script>
 </body>
 </html>
